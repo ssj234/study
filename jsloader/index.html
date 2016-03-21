@@ -12,9 +12,9 @@
 <script type="text/javascript" src="uxloader.js"></script>
 <script type="text/javascript">
 	require.config({
-		"a":"a",
-		"b":"b",
-		"c":"c"
+		"a":"test/a",
+		"b":"test/b",
+		"c":"test/c"
 	});
 	require(['a','b','c'],function(a,b,c){
 		alert(a.a(1)+b.b(1)+c.c(1));
