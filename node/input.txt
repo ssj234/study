@@ -1,0 +1,2 @@
+hello
+this is the node.js test case for fs module！
