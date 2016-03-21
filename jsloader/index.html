@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	1.config set path-map</br>
+	2.define</br>
+	3.require</br>
+</body>
+<script type="text/javascript" src="uxloader.js"></script>
+<script type="text/javascript">
+	require.config({
+		"a":"a",
+		"b":"b",
+		"c":"c"
+	});
+	require(['a','b','c'],function(a,b,c){
+		alert(a.a(1)+b.b(1)+c.c(1));
+	})
+</script>
+</html>
