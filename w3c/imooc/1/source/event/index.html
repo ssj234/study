@@ -1,0 +1,34 @@
+<html>
+ <head>
+   <title>事件流</title>
+   <meta charset="utf-8">
+   <link href="../../../../global/css/common.css" rel="stylesheet"/>
+ </head>
+   <body>
+   <div class="block">
+	<div class="head">事件示例</div>
+	<ul>
+		<li>id为box的dom元素（红色边框为box）添加事件，点击后弹出'我是整个父盒子'</li>
+		<li>showMes按钮添加了HTML级onclick事件，点击后会弹出showMes，并冒泡到box<br/></li>
+		<li>normal按钮未添加事件，点击后会冒泡到box<br/></li>
+		<li>id=goA标签添加事件，点击后弹出'结点名称'并阻止冒泡 阻止默认行为<br/></li>
+		<li>id=goA标签未添加事件，点击后转至event.html</li>
+		<li><a href="js/script.js" target="_blank">JS代码</a></li>
+		
+	</ul>
+	<div class="example" id="box" style="border:1px solid red">
+	 	<input type="button" value="showMes" id="btn" onclick="showMes()">
+         <input type="button" value="normal" id="btn2">
+         <a href="event.html" id="go">id=go</a>
+         <a href="event.html" id="go1">id!=go</a>
+     </div>
+</div>
+
+    <script src="js/event.js"></script>
+   <script src="js/script.js"></script>
+   <script>
+   		function showMes(){
+				alert("showMes");
+   	   	}
+   </script>
+   </body>

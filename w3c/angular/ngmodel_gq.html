@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html ng-app="MyModule"><!--一切都是从模块开始的-->
+	<head>
+		<meta charset="UTF-8"/>
+		<title>过滤器</title>
+		
+	</head>
+	<body>
+		<div ng-controller="myCtrl">
+			<input type="text" placeholder="12323" />
+			<input type="text" ng-model="name" ng-replace="请输入名字"/>
+			<input type="text" ng-model="age" ng-replace="ageHolder" ng-change="change();"/>
+			<input type="button" ng-click="click();" value="click"/>
+			<input type="button" ng-click="getVal();" value="get"/>
+			<input type="button" ng-click="reset();" value="reset"/>
+			<input type="button" ng-click="reset1();" value="reset"/>
+		</div>	
+	</body>
+	<script src="js/angular.js"></script>
+	<script>
+		//定义一个模块，模块名为MyModule，对应ng-app
+		var myModual=angular.module("MyModule",[]);
+		myModual.directive("ngReplace",function(){
+			return {
+				restrict:'A',
+				template:'',
+				require:'^?ngModel',
+				link:function($scope,element,attr,ngModel){
+					var replace=attr.ngReplace,
+					cnt=eval("$scope."+replace),
+					defaultVal,defaultOld;
+					if(cnt)
+					{
+						defaultVal=cnt;//若为变量
+					}else{
+						defaultVal=replace;//若为文字描述
+					}
+					defaultOld=defaultVal;//设置old 便于变量改变时focus时，清空输入框
+					//console.log("defaultVal--->"+defaultVal);
+					
+					//获取默认值
+					var dftVal=function(){
+						if(cnt)
+						{
+							var tmp=eval("$scope."+replace);
+							if(tmp!=defaultVal){//若发生编号
+								defaultOld=defaultVal;//设置old
+								defaultVal=tmp;//设置new值
+							}
+							return tmp;
+						}else{
+							return defaultVal;
+						}
+					}
+					//设置值和css
+					var setViewAndCSS=function(value){
+						var defaultVal=dftVal();
+						if(ngModel.$isEmpty(value)||value==defaultVal)
+						{
+							if(document.activeElement!=element[0]){
+							    element.val(defaultVal);
+                                element.css('color',"green");
+							}
+							
+							
+							//element[0].blur();
+							/*if (element[0].setSelectionRange) { // 标准浏览器
+                element[0].setSelectionRange(0, 0);
+            }else{
+            	var range = element[0].createTextRange()
+                range.moveStart("character", 0);
+                range.moveEnd("character", 0);
+                range.moveStart("character", 0);
+                range.moveEnd("character", 0);
+                range.select();
+            }*/
+							console.log(defaultVal);
+						}else{
+							element.val(value);
+							element.css('color',"black");
+						}
+					}
+					//focus
+					var setFocus=function(value){
+						var defaultVal=dftVal();
+						if(value==defaultVal||value==defaultOld)
+						{
+							element.val("");
+							element.css('color',"blue");
+						}else{
+							element.css('color',"black");
+						}
+					}
+					//
+					ngModel.$render=function(){
+						console.log('$render');
+					};
+					ngModel.$parsers.push(function(viewValue){
+						var defaultVal=dftVal();
+						console.log("$parse-->"+viewValue);
+						if(!viewValue||viewValue==defaultVal)
+							return undefined;
+						return viewValue;//viewValue
+					});
+					ngModel.$formatters.push(function(viewValue){
+						var defaultVal=dftVal();
+						console.log("formatters-->"+viewValue);
+						setViewAndCSS(viewValue);
+						if(!viewValue||viewValue==defaultVal)
+							return defaultVal;
+						return viewValue;//viewValue
+					});
+					ngModel.$viewChangeListeners.push(function(){
+						var defaultVal=dftVal();
+						console.log("viewValue-->"+ngModel.$viewValue);
+						var index=ngModel.$viewValue.indexOf(defaultVal);
+						if(index>-1)
+						{
+							 setViewAndCSS(ngModel.$viewValue.substring(0,index));
+							 return;
+						}
+						setViewAndCSS(ngModel.$viewValue);
+					});
+					setViewAndCSS(ngModel.$viewValue);
+					
+					element.bind("focus",function(){
+						setFocus(element.val());
+					});
+					element.bind("blur",function(){
+						setViewAndCSS(element.val());
+					});
+					
+				}
+			};
+		});
+		myModual.controller("myCtrl",function($scope,$http){
+			
+			$scope.ageHolder="请输入";
+			$scope.rand=function(){
+				return Math.random();
+			}
+			$scope.change=function(){
+				console.log('change----event---->'+$scope.rand());
+			}
+			$scope.click=function(){
+				$scope.age=28;
+				$scope.name="shishengjie";
+			}
+			$scope.getVal=function(){
+				alert($scope.name+"  "+$scope.age);
+			}
+			$scope.reset=function(){
+				$scope.ageHolder="请输入18-70岁";
+			}
+			$scope.reset1=function(){
+				$scope.ageHolder="请输入70岁";
+			}
+		});
+	</script>
+</html>

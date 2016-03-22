@@ -1,0 +1,50 @@
+function $LogProvider() {
+		var debug = !0,self = this;//debug默认为false
+		this.debugEnabled = function(flag) {
+			//若flag不为undefined，设置debug为flag，否则返回debug
+			return isDefined(flag) ? (debug = flag, this) : debug
+		}, 
+		this.$get = ["$window",
+			function($window) {
+				//格式化错误信息
+				function formatError(arg) {
+					 //若arg为Error对象，stack不为空
+					arg instanceof Error 
+					&& (arg.stack 
+						? arg = arg.message && -1 === arg.stack.indexOf(arg.message) 
+							? "Error: " + arg.message + "\n" + arg.stack 
+							: arg.stack 
+						: arg.sourceURL && (arg = arg.message + "\n" + arg.sourceURL + ":" + arg.line)), 
+
+					return arg;
+				}
+				//返回打印方法
+				function consoleLog(type) {
+					var console = $window.console || {}, logFn = console[type] || console.log || noop;
+					return logFn.apply //若打印方法可用，返回一个方法，该方法将参数压入输入并打印
+					? function() {
+						var args = [];
+						return forEach(arguments, function(arg) {
+							args.push(formatError(arg))
+						}), logFn.apply(console, args)
+					}
+					: function(arg1, arg2) {//打印方法不可用，直接打印
+						logFn(arg1, null == arg2 ? "" : arg2)
+					}
+				}
+
+				return {
+					log: consoleLog("log"),
+					info: consoleLog("info"),
+					warn: consoleLog("warn"),
+					error: consoleLog("error"),
+					debug: function() {
+						var fn = consoleLog("debug");
+						return function() {
+							debug && fn.apply(self, arguments)//debug为true是才打印
+						}
+					}()
+				}
+			}
+		]
+	}

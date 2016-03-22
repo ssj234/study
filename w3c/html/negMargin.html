@@ -1,0 +1,205 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>negative height TEST</title>
+	<style type="text/css">
+		.main{
+			width: 50%;
+			background: cyan;
+			min-height: 200px;
+			box-shadow: 0px 0px 10px 0px #ddd;
+			margin: 0 auto;
+			height: 100%;
+			position:relative;
+		}
+
+		.left{
+			
+			background: red;
+			min-height: 50px;
+			margin: dd10px 10px;
+			box-shadow: 0px 0px 10px 0px #000;
+			font-size: 20px;
+			color: #fff;
+			text-align: center;
+		}
+		
+		.right{
+			
+			background: #ddd;
+			min-height: 50px;
+			margin: dd10px;
+			box-shadow: 0px 0px 10px 0px #000;
+			font-size: 20px;
+			color: #fff;
+			text-align: center;
+		}
+		.bottom{
+			
+			background: green;
+			min-height: 50px;
+			margin: dd10px;
+			box-shadow: 0px 0px 10px 0px #000;
+			font-size: 20px;
+			color: #fff;
+			text-align: center;
+			
+		}
+		.line{
+			background: #ddd;
+			margin:5px;
+			padding: 5px;
+			color:#000;
+			font-size: 10px;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body >
+<div>
+	<div class="line" onclick="over(0,this)"  >想不想体验一下负边距的威力？<br/></div>
+	<div class="line" onclick="over(1,this)" >1.普通文档流中，将right的margin-top设置为-30px，会将从该文档起的文档流向上平移30px,bottom的位置也发生了变化<br/></div>
+	<div class="line" onclick="over(2,this)" >2.普通文档流中，将right的margin-bottom设置为-30px，会将从下个文档起的文档流向下平移30px,right的位置未改变，bottom的位置发生了变化<br/></div>
+	<div class="line" onclick="over(3,this)" >3.普通文档流中，设置宽度的情况下，<a href="javascript:over(30,this);">将left的margin-left设置为-30px，左偏移</a>;<a href="javascript:over(31,this);">将left的margin-right设置为-30px，不变</a> <a href="javascript:over(32,this);">同时设置left的左右负内边距</a></div>
+	<div class="line" onclick="over(4,this)" >4.普通文档流中，不设置宽度的情况下，<a href="javascript:over(40,this);">将right的margin-left设置为-30px，right的宽度向左增加30px</a>;<a href="javascript:over(41,this);">将right的margin-right设置为-30px，right的宽度向右增加30px</a> <a href="javascript:over(42,this);">同时设置左右负内边距</a></div>
+	<div class="line" onclick="over(5,this)" >5.将bottom设置为绝对定位，<a href="javascript:over(50,this);">left为-30px,向左偏移</a>===<a href="javascript:over(51,this);">right为-30px,无反应</a>===<a href="javascript:over(52,this);">top为-30px，向上偏移</a>===<a href="javascript:over(53,this);">bottom为-30px，无反应</a></div>
+</div>
+<div id="div" class="main">
+	<div id="div1" class="left">
+		left
+	</div>
+	<div id="div2" class="right">
+		right
+	</div>
+	<div id="div3" class="bottom">
+		bottom
+	</div>
+</div>
+<script type="text/javascript">
+
+	if (!document.getElementsByClassName) {
+		document.getElementsByClassName=function(name){
+			var tmp=document.getElementsByTagName("*");
+			var rs=new Array();
+			for (var i = tmp.length - 1; i >= 0; i--) {
+				if(tmp[i].className==name)
+				{
+					rs.push(tmp[i]);
+				}
+			};
+			return rs;
+		}
+	}
+	function over(type,e)
+	{
+		out();
+		if(e&&(!e instanceof Window))
+		e.style.background="green";
+		var t=document.getElementById("div");
+		var t1=document.getElementById("div1");
+		var t2=document.getElementById("div2");
+		var t3=document.getElementById("div3");
+		if(type==1)
+		{
+			t2.style.marginTop="-30px";
+		}
+		if(type==2)
+		{
+			t2.style.marginBottom="-30px";
+		}
+		if(type==30)
+		{
+			t1.style.width="100%";
+			t1.style.marginLeft="-30px";
+		}
+		if(type==31)
+		{
+			t1.style.width="100%";
+			t1.style.marginRight="-30px";
+		}
+		if(type==32)
+		{	
+			t1.style.width="100%";
+			t1.style.marginRight="-30px";
+			t1.style.marginLeft="-30px";
+		}
+		if(type==40)
+		{
+			t2.style.marginLeft="-30px";
+		}
+		if(type==41)
+		{
+			t2.style.marginRight="-30px";
+		}
+		if(type==42)
+		{
+			t2.style.marginRight="-30px";
+			t2.style.marginLeft="-30px";
+		}
+
+		if(type==5)
+		{
+			t3.style.position="absolute" ;
+			t3.style.top="50%";
+			t3.style.left="50%";
+		}
+		if(type==50)
+		{
+			
+			t3.style.position="absolute" ;
+			t3.style.top="50%";
+			t3.style.left="50%";
+			t3.style.marginLeft="-30px";
+			
+		}
+		if(type==51)
+		{
+			t3.style.position="absolute" ;
+			t3.style.top="50%";
+			t3.style.left="50%";
+			t3.style.marginRight="-30px";
+		}
+		if(type==52)
+		{
+			t3.style.position="absolute" ;
+			t3.style.top="50%";
+			t3.style.left="50%";
+			t3.style.marginTop="-30px";
+		}
+		if(type==53)
+		{
+			t3.style.position="absolute" ;
+			t3.style.top="50%";
+			t3.style.left="50%";
+			t3.style.marginBottom="-30px";
+		}
+	}
+
+	//<br style="clear:both"/>
+	function out(type)
+	{
+		var t=document.getElementById("div");
+		var t1=document.getElementById("div1");
+		var t2=document.getElementById("div2");
+		var t3=document.getElementById("div3");
+
+		var line=document.getElementsByClassName("line");
+		for(var i=0;i<line.length;i++)
+		{
+			line[i].style.background="#ddd";
+		}
+
+		
+		//
+		t2.style.margin="0px";
+		t1.style.margin="0px";
+		t3.style.margin="0px";
+
+			t3.style.position="" ;
+			t3.style.top="";
+			t3.style.left="";
+	}
+</script>
+</body>
+</html>

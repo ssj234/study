@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>WORDBREAK TEST</title>
+	<style type="text/css">
+	div.test{
+		width: 100px;
+		height: 60px;
+		background: cyan;
+		margin: 50px;
+		border: 2px dashed red;
+		padding: 5px;
+	}
+	</style>
+</head>
+<body >
+
+<div>
+	<div onmouseover="over(1)"  onmouseout="out(1)">默认情况<br/></div>
+	<div onmouseover="over(2)"  onmouseout="out(2)">设置word-wrap:break-word后,由于长单词word..dd的长度不足以与long处于同一行，因此放在下行显示<br/></div>
+	<div onmouseover="over(3)"  onmouseout="out(3)">设置word-break:break-all后,强制拆分长单词word..<br/></div>
+	<div onmouseover="over(4)"  onmouseout="out(4)">设置word-break:break-word后,chrome下与word-wrap:break-word相同，IE下与默认情况相同<br/></div>
+</div>
+<div id="div1" class="test">this is a long wordddddddddddddddddddddddddd</div>
+<div id="div2" class="test" style="word-wrap:break-word;">this is a long wordddddddddddddddddddddddddd</div>
+<div id="div3" class="test" style="word-break:break-all;">this is a long wordddddddddddddddddddddddddd</div>
+<div id="div4" class="test" style="word-break:break-word;">this is a long wordddddddddddddddddddddddddd</div>
+<script type="text/javascript">
+	function over(type)
+	{
+		var t=document.getElementById("div"+type);
+		t.style.borderColor="blue";
+	}
+	function out(type)
+	{
+		var t=document.getElementById("div"+type);
+		t.style.borderColor="red";
+	}
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset=utf8>
+	<title>源码分析</title>
+</head>
+<body ng-app="myApp">
+<div ng-controller="myCtrl">
+	<input type="" ng-model="name">{{name}}
+	<a href="#">1</a>
+	<aaa></aaa>
+</div>
+
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="angular-framework.js"></script>
+<script type="text/javascript">
+	
+var app=angular.module("myApp",[]);
+
+	app.factory("$heheda",function($http){
+		console.log("heheda");
+		return {hehe:123};
+	});
+	app.controller("myCtrl",["$heheda","$scope",function($heheda,$scope){
+		console.log("$heheda>>"+$heheda );
+		$scope.go=function(){
+			alert(999);
+		};
+	}]);
+	app.directive("aaa",["$compile",function($compile){
+		//return function(){};
+		return {
+			restrict : 'CAE',
+			compile:function(element,attr){
+				var t=$compile("<a ng-click='go();'>go</a>");
+				//element.append(t);
+
+				return function($scope){
+					element.append(t($scope));
+				}
+			}
+		}
+	}]);
+	
+
+</script>
+</body>
+</html>

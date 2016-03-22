@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>CSS3动画-transform</title>
+<link href="../global/css/common.css" rel="stylesheet"/>
+<link href="../jfunUI/css/jfun_tooltip.css" rel="stylesheet"/>
+<style>
+.origin{
+	width:200px;
+	height:200px;
+	border:1px dashed red;
+	margin:100px;
+}
+.transform{
+	width:198px;
+	height:198px;
+	background:grey;
+	position:absolute;
+	top:21px;
+	left:22px;
+	margin:100px;
+	opacity:0.8;
+}
+.example{
+	position:relative;
+}
+</style>
+</head>
+<body>
+<div class="block">
+	<div class="head">动画-transform</div>
+	<ul>
+		<li>transform主要用于DOM元素展现的变形，包括：</li>
+		<li>1、rotate(xdeg)	旋转x度，在二维空间内变形。<br/></li>
+	</ul>
+	<div class="example">
+		<div class="origin"></div>
+		<div class="transform" id="rotateDIV"></div>
+		<input type="button" id="rotate" name="rotate" value="rotate" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="旋转45度" jfun_content="$id.css(‘transform’,‘rotate(20deg)’);"/>
+	</div>
+	<ul>
+		<li>2、skew()	扭曲x度，能跟让元素倾斜显示，以其X轴和Y轴按照一定角度倾斜。<br/>
+			skew(x,y)	使元素在水平和垂直方向同时扭曲<br/>
+			skewX(x)	使元素在水平方向扭曲X度<br/>
+			skewY(y)	使元素在垂直方向扭曲Y度<br/></li>
+	</ul>
+	<div class="example">
+		<div class="origin"></div>
+		<div class="transform" id="skewDIV"></div>
+		<input type="button" id="skew" name="skew" value="skew" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="扭曲30度" jfun_content="$id.css(‘transform’,‘rotate(30deg)’);"/>
+		<input type="button" id="skewX" name="skewX" value="skewX" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="X轴扭曲10度" jfun_content="$id.css(‘transform’,‘rotateX(10deg)’);"/>
+		<input type="button" id="skewY" name="skewY" value="skewY" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="Y轴扭曲10度" jfun_content="$id.css(‘transform’,‘rotateY(10deg)’);"/>
+	</div>
+	
+	<ul>
+		<li>3、scale()	缩放大小，能跟让元素根据原点对对象进行缩放<br/>
+			scale(x,y)	使元素在水平和垂直方向同时缩放<br/>
+			scaleX(x)	使元素在水平方向缩放X倍<br/>
+			scaleY(y)	使元素在垂直方向缩放Y倍<br/></li>
+	</ul>
+	<div class="example">
+		<div class="origin"></div>
+		<div class="transform" id="scaleDIV"></div>
+		<input type="button" id="scale" name="scale" value="scale" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="缩放0.8" jfun_content="$id.css(‘transform’,‘scale(0.8,0.8)’);"/>
+		<input type="button" id="scaleX" name="scaleX" value="scaleX" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="X轴缩放1.5" jfun_content="$id.css(‘transform’,‘scaleX(1.5)’);"/>
+		<input type="button" id="scaleY" name="scaleY" value="scaleY" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="Y轴缩放1.5" jfun_content="$id.css(‘transform’,‘scaleY(1.5)’);"/>
+	</div>
+	
+	<ul>
+		<li>4、translate()	位移，类似relative，对dom元素移动<br/>
+			translate(x,y)	使元素在水平和垂直方向同时移动<br/>
+			translateX(x)	使元素在水平方向移动X<br/>
+			translateY(y)	使元素在垂直方向移动Y<br/></li>
+	</ul>
+	<div class="example">
+		<div class="origin"></div>
+		<div class="transform" id="translateDIV"></div>
+		<input type="button" id="translate" name="translate" value="translate" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="位移20px" jfun_content="$id.css(‘transform’,‘translate(20px,20px)’);"/>
+		<input type="button" id="translateX" name="translateX" value="translateX" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="X轴位移50%" jfun_content="$id.css(‘transform’,‘translate(50%)’);"/>
+		<input type="button" id="translateY" name="translateY" value="translateY" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="Y轴位移-10em" jfun_content="$id.css(‘transform’,‘translate(-10em)’);"/>
+	</div>
+	
+	<ul>
+		<li>5、matrix()	是一个含有六个值的矩阵(a,b,c,d,e,f),按矩阵进行二维变换
+			<pre>
+			[a  c  e]	*	[x]		=	[ax+cy+e]
+			[b  d  f]	*	[y]		=	[bx+dy+f]
+			[0  0  1]	*	[1]		=	[1]
+			</pre></li>
+		<li>e和f为位移,matrix('1,0,0,1,30,30')	<a href="#matrixDIV" onclick="javascript:setMatrix('1,0,0,1,30,30');">test</a></li>
+		<li>abcd的配置可为rotate/skew/scale<br/>
+			scale	matrix('2,0,0,0.5,0,0')可在X轴缩放2倍数，Y轴缩放0.5倍数	<a href="#matrixDIV" onclick="javascript:setMatrix('2,0,0,0.5,0,0');">test</a><br/>
+					2,0,0,0.5,0,0计算后 X=2X Y=0.5Y<br/>
+			skew	matrix('1,1,0,1,0,0')可对Y轴进行旋转	<a href="#matrixDIV" onclick="javascript:setMatrix('1,1,0,1,0,0');">test</a><br/>
+					1,1,0,1,0,0计算后 X=X Y=X+Y<br/>
+			rotate	matrix('0.866025,0.5,-0.5,0.866025,0,0')可进行旋转	<a href="#matrixDIV" onclick="javascript:setMatrix('0.866025,0.5,-0.5,0.866025,0,0');">test</a><br/>
+					(cos0 sin0 -sin0 cos0)旋转计算X=cos0*X-sin0*Y	Y=sin0*X+cos0*Y<br/></li>
+	</ul>
+	<div class="example">
+		<div class="origin"></div>
+		<div class="transform" id="matrixDIV"></div>
+		<input type="text" id="matrixVal" name="matrixVal" value="1,1,0,1,0,0"/>
+		<input type="button" id="matrix" name="matrix" value="matrix" />
+	</div>
+	
+	<ul>
+		<li>6、transform-origin 设置原点的位置，任何一个元素都有一个中心点，默认情况下，其中心点是X轴和Y轴的50%处<br/>
+			CSS变形的旋转/位移/缩放/扭曲等都是以自己的原点进行变形的<br/>
+			可使用的属性有:top left bottom right center,也可为百分百 像素</li>
+	</ul>
+	<div class="example">
+		<input type="button" id="origin" name="origin" value="translate" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="设置原点" jfun_content="transform-origin:right top"/>
+		<input type="button" id="origin_px" name="origin_px" value="origin_px" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="设置原点" jfun_content="transform-origin:50px 50px"/>
+		<input type="button" id="origin_po" name="origin_po" value="origin_po" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="设置原点" jfun_content="transform-origin:50% 50%"/>
+	</div>
+</div>
+
+<script language="javascript" src="../global/js/jquery.js"></script>
+<script language="javascript" src="../jfunUI/js/jquery.jfun.tooltip.js"></script>
+<script>
+	
+	$(document).ready(function(){
+		$("#rotate").click(function(){
+			addTransform($("#rotateDIV"),"rotate(45deg)");
+		});
+		$("#skew").click(function(){
+			addTransform($("#skewDIV"),"skew(30deg,30deg)");
+		});
+		$("#skewX").click(function(){
+			addTransform($("#skewDIV"),"skewX(10deg)");
+		});
+		$("#skewY").click(function(){
+			addTransform($("#skewDIV"),"skewY(10deg)");
+		});
+		//
+		$("#scale").click(function(){
+			addTransform($("#scaleDIV"),"scale(0.8,0.8)");
+		});
+		$("#scaleX").click(function(){
+			addTransform($("#scaleDIV"),"scaleX(1.5)");
+		});
+		$("#scaleY").click(function(){
+			addTransform($("#scaleDIV"),"scaleY(0.5)");
+		});
+		//
+		$("#translate").click(function(){
+			addTransform($("#translateDIV"),"translate(20px,20px)");
+		});
+		$("#translateX").click(function(){
+			addTransform($("#translateDIV"),"translateX(50%)");
+		});
+		$("#translateY").click(function(){
+			addTransform($("#translateDIV"),"translateY(-10em)");
+		});
+		//
+		$("#matrix").click(function(){
+			addTransform($("#matrixDIV"),"matrix("+$("#matrixVal").val()+")");
+		});
+		//
+		$("#origin").click(function(){
+			addTransform($(".transform"),"right top","origin");
+		});
+		$("#origin_px").click(function(){
+			addTransform($(".transform"),"50px 50px","origin");
+		});
+		$("#origin_po").click(function(){
+			addTransform($(".transform"),"50% 50%","origin");
+		});
+	});
+	function setMatrix(value){
+		var $id=$("#matrixDIV");
+		addTransform($id,'matrix('+value+')');
+	}
+	function addTransform($id,value,tail)
+	{
+		if(!tail)
+			tail="";
+		else
+			tail="-"+tail; 
+		$id.css("-webkit-transform"+tail,value);
+		$id.css("-moz-transform"+tail,value);
+		$id.css("-ms-transform"+tail,value);
+		$id.css("transform"+tail,value);
+		/*setTimeout(function(){
+			$id.css("-webkit-transform","");
+			$id.css("-moz-transform","");
+			$id.css("-ms-transform","");
+			$id.css("transform","");
+			},3000);*/
+	}
+</script>
+</body>
+</html>

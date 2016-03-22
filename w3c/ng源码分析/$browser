@@ -1,0 +1,147 @@
+function $BrowserProvider() {
+          this.$get = ["$window", "$log", "$sniffer", "$document",
+               function($window, $log, $sniffer, $document) {
+                    return new Browser($window, $document, $log, $sniffer)
+               }
+          ]
+     }
+
+     function Browser(window, document, $log, $sniffer) {
+
+     	//调用fn，执行outstandingRequestCallbacks数组
+		function completeOutstandingRequest(fn) {
+			try {
+				fn.apply(null, sliceArgs(arguments, 1))
+			} finally {
+				if (outstandingRequestCount--, 0 === outstandingRequestCount)
+					for (; outstandingRequestCallbacks.length;) try {
+						outstandingRequestCallbacks.pop()()
+					} catch (e) {
+						$log.error(e)
+					}
+			}
+		}
+
+		function startPoller(interval, setTimeout) {
+			! function check() {
+				forEach(pollFns, function(pollFn) {
+					pollFn()
+				}), 
+				pollTimeout = setTimeout(check, interval)//
+			}()
+		}
+
+		//
+		function fireUrlChange() {
+			newLocation = null, 
+			//当前url为最新则设置lastBrowserUrl为当前url
+			lastBrowserUrl != self.url() && (lastBrowserUrl = self.url(), 
+			//并遍历执行监听事件
+			forEach(urlChangeListeners, function(listener) {
+				listener(self.url())
+			}))
+		}
+
+		var self = this,
+			rawDocument = document[0],
+			location = window.location,
+			history = window.history,
+			setTimeout = window.setTimeout,
+			clearTimeout = window.clearTimeout,
+			pendingDeferIds = {};//保存
+		self.isMock = !1;
+		var outstandingRequestCount = 0,
+			outstandingRequestCallbacks = [];
+		self.$$completeOutstandingRequest = completeOutstandingRequest, 
+
+		//outstandingRequestCount++
+		self.$$incOutstandingRequestCount = function() {
+			outstandingRequestCount++
+		}, 
+		//
+		self.notifyWhenNoOutstandingRequests = function(callback) {
+			forEach(pollFns, function(pollFn) {
+				pollFn()
+			}), 0 === outstandingRequestCount ? callback() : outstandingRequestCallbacks.push(callback)
+		};
+		var pollTimeout, pollFns = [];
+		self.addPollFn = function(fn) {
+			//pollTimeout为空则启动循环事件，0.1s一次；将fn加入事件
+			return isUndefined(pollTimeout) && startPoller(100, setTimeout), pollFns.push(fn), fn
+		};
+		var lastBrowserUrl = location.href,//最近的url为当前url
+			baseElement = document.find("base"),
+			newLocation = null;
+
+		//设置或返回url地址
+		self.url = function(url, replace) {
+			//设置location为当前的location，若url不为空
+			if (location !== window.location && (location = window.location), url) {
+				if (lastBrowserUrl == url) return;//若最近的url相同，不触发事件
+				 lastBrowserUrl = url, //设置为最近的url
+				$sniffer.history ?
+					//若history可用，replace参数为true，更改当前的历史记录为url；否则pushState往历史记录堆栈顶部添加一条记录
+					 replace ? history.replaceState(null, "", url) : (history.pushState(null, "", url), baseElement.attr("href", baseElement.attr("href"))) 
+					//history不可用，设置newLocation，replace参数为true，替换url，否则设置为当前url
+					 : (newLocation = url, replace ? location.replace(url) : location.href = url), 
+				return self;//返回本对象
+			}
+			//url为空，返回newLocation；为空则返回location的href
+			return newLocation || location.href.replace(/%27/g, "'")//替换单引号
+		};
+		var urlChangeListeners = [],//所有的监听事件
+			urlChangeInit = !1;
+		//添加监听事件
+		self.onUrlChange = function(callback) {
+			//urlChangeInit标志位，下次不添加事件，只加入数组
+			//支持history，则加入popstate事件，监听事件为fireUrlChange
+			urlChangeInit || ($sniffer.history && jqLite(window).on("popstate", fireUrlChange), 
+			$sniffer.hashchange //支持hashchange（h5），加入hashchange事件
+				? jqLite(window).on("hashchange", fireUrlChange) 
+				: self.addPollFn(fireUrlChange), 
+			urlChangeInit = !0),//不支持hashchange,则将fireUrlChange加入，0.1s检查一遍触发事件（url未改变则不执行监听事件）
+				 urlChangeListeners.push(callback),//加入监听函数
+			return callback
+		}, 
+		//返回
+		self.baseHref = function() {
+			var href = baseElement.attr("href");
+			return href ? href.replace(/^https?\:\/\/[^\/]*/, "") : ""
+		};
+		var lastCookies = {}, lastCookieString = "",
+			cookiePath = self.baseHref();
+		//设置或返回cookie
+		self.cookies = function(name, value) {
+			var cookieLength, cookieArray, cookie, i, index;
+			if (!name) {//若name为空，
+				if (rawDocument.cookie !== lastCookieString)
+					for (lastCookieString = rawDocument.cookie, cookieArray = lastCookieString.split("; "), lastCookies = {}, i = 0; i < cookieArray.length; i++) 
+						cookie = cookieArray[i], 
+						index = cookie.indexOf("="), 
+						index > 0 && (name = unescape(cookie.substring(0, index)), 
+						lastCookies[name] === undefined && (lastCookies[name] = unescape(cookie.substring(index + 1))));
+				return lastCookies
+			}
+			//name不为空，value为空，设置cookie为空；cookiePath为baseHref
+			value === undefined 
+			? rawDocument.cookie = escape(name) + "=;path=" + cookiePath + ";expires=Thu, 01 Jan 1970 00:00:00 GMT" 
+			//name不为空，value不为空，设置
+			: isString(value) && (cookieLength = (rawDocument.cookie = escape(name) + "=" + escape(value) + ";path=" + cookiePath).length + 1, 
+				//长度大于4096，打印警告
+				cookieLength > 4096 && $log.warn("Cookie '" + name + "' possibly not set or overflowed because it was too large (" + cookieLength + " > 4096 bytes)!"))
+		}, 
+		//加入pendingDeferIds数组
+		self.defer = function(fn, delay) {
+			var timeoutId;
+			 outstandingRequestCount++, 
+			 timeoutId = setTimeout(function() {
+				delete pendingDeferIds[timeoutId], completeOutstandingRequest(fn)
+			}, delay || 0), 
+			pendingDeferIds[timeoutId] = !0;
+			return timeoutId
+		},
+		// 
+		self.defer.cancel = function(deferId) {
+			return pendingDeferIds[deferId] ? (delete pendingDeferIds[deferId], clearTimeout(deferId), completeOutstandingRequest(noop), !0) : !1
+		}
+	}

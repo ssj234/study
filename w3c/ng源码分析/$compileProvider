@@ -1,0 +1,690 @@
+function $CompileProvider($provide) {
+
+		var hasDirectives = {}, 
+			Suffix = "Directive",
+			COMMENT_DIRECTIVE_REGEXP = /^\s*directive\:\s*([\d\w\-_]+)\s+(.*)$/,
+			CLASS_DIRECTIVE_REGEXP = /(([\d\w\-_]+)(?:\:([^;]+))?;?)/,
+			aHrefSanitizationWhitelist = /^\s*(https?|ftp|mailto|tel|file):/,
+			imgSrcSanitizationWhitelist = /^\s*(https?|ftp|file):|data:image\//,
+			EVENT_HANDLER_ATTR_REGEXP = /^(on[a-z]+|formaction)$/;
+		
+		//注册指令，参数：指令名，指令工厂方法
+		this.directive = function registerDirective(name, directiveFactory) {
+			 assertNotHasOwnProperty(name, "directive"), 
+
+			 isString(name) ? (assertArg(directiveFactory, "directiveFactory"), 
+
+			 hasDirectives.hasOwnProperty(name) || (hasDirectives[name] = [], //若未加过，设置为空数组
+
+			 //将调用$provide.provider()方法，设置name+Directive+Provider；
+			 $provide.factory(name + Suffix, ["$injector", "$exceptionHandler",
+				function($injector, $exceptionHandler) {
+					var directives = [];
+					//指令可以设置多个，按照顺序来执行
+					 forEach(hasDirectives[name], function(directiveFactory, index) {
+						try {
+							var directive = $injector.invoke(directiveFactory);//获取实例
+							//指令返回的是函数，将其当做compile方法
+							isFunction(directive) ? directive = {
+								compile: valueFn(directive)
+							} 
+							: //不是函数，是对象
+							//若无compile方法，且link不为空，将link作为compile
+							//将directive保存在directives数组。
+							!directive.compile && directive.link && (directive.compile = valueFn(directive.link)), directive.priority = directive.priority || 0, directive.index = index, directive.name = directive.name || name, directive.require = directive.require || directive.controller && directive.name, directive.restrict = directive.restrict || "A", directives.push(directive)
+						} catch (e) {
+							$exceptionHandler(e)
+						}
+					}), 
+					return directives;
+				}
+			])), 
+			hasDirectives[name].push(directiveFactory)) //设置指令和工厂方法的对应关系 
+
+			:forEach(name, reverseParams(registerDirective)), //name为对象，遍历
+			return this;
+		}, 
+
+		this.aHrefSanitizationWhitelist = function(regexp) {
+			return isDefined(regexp) ? (aHrefSanitizationWhitelist = regexp, this) : aHrefSanitizationWhitelist
+		}, 
+
+
+		this.imgSrcSanitizationWhitelist = function(regexp) {
+			return isDefined(regexp) ? (imgSrcSanitizationWhitelist = regexp, this) : imgSrcSanitizationWhitelist
+		}, 
+
+
+		this.$get = ["$injector", "$interpolate", "$exceptionHandler", "$http", "$templateCache", "$parse", "$controller", "$rootScope", "$document", "$sce", "$animate",
+			function($injector, $interpolate, $exceptionHandler, $http, $templateCache, $parse, $controller, $rootScope, $document, $sce, $animate) {
+				//首次调用$compile时，会get("$compile"),返回compile对象
+				function compile($compileNodes, transcludeFn, maxPriority, ignoreDirective, previousCompileContext) {
+					
+					//若不为jQuery对象，将其包装为jQuery对象
+					$compileNodes instanceof jqLite || ($compileNodes = jqLite($compileNodes)), 
+					
+					//遍历节点，若为文本节点，其值为非空白，使用<span>包装文本节点
+					forEach($compileNodes, function(node, index) {
+						3 == node.nodeType && node.nodeValue.match(/\S+/) && ($compileNodes[index] = node = jqLite(node).wrap("<span></span>").parent()[0])
+					});
+
+					//调用编译节点，首次调用时在compile(element)(scope)中，element为appElement,scope为rootScope
+					//会遍历编译子孙节点，返回一个link函数
+					var compositeLinkFn = compileNodes($compileNodes, transcludeFn, $compileNodes, maxPriority, ignoreDirective, previousCompileContext);
+
+					//编译某个节点后，返回的方法，用于与scope链接
+					return function(scope, cloneConnectFn, transcludeControllers) {
+						assertArg(scope, "scope");
+						var $linkNode = cloneConnectFn ? JQLitePrototype.clone.call($compileNodes) : $compileNodes;
+						forEach(transcludeControllers, function(instance, name) {
+							$linkNode.data("$" + name + "Controller", instance)
+						});
+						for (var i = 0, ii = $linkNode.length; ii > i; i++) {
+							var node = $linkNode[i];
+							(1 == node.nodeType || 9 == node.nodeType) && $linkNode.eq(i).data("$scope", scope)
+						}
+						return safeAddClass($linkNode, "ng-scope"), cloneConnectFn && cloneConnectFn($linkNode, scope), compositeLinkFn && compositeLinkFn(scope, $linkNode, $linkNode), $linkNode
+					}
+				}
+
+				function safeAddClass($element, className) {
+					try {
+						$element.addClass(className)
+					} catch (e) {}
+				}
+
+				//编译节点，此处会遍历所有节点
+				function compileNodes(nodeList, transcludeFn, $rootElement, maxPriority, ignoreDirective, previousCompileContext) {
+					var nodeLinkFn, childLinkFn, directives, attrs, linkFnFound, linkFns = [];
+					function compositeLinkFn(scope, nodeList, $rootElement, boundTranscludeFn) {
+						var nodeLinkFn, childLinkFn, node, $node, 
+						childScope, childTranscludeFn, i, ii, n, stableNodeList = [];
+						for (i = 0, ii = nodeList.length; ii > i; i++) 
+							stableNodeList.push(nodeList[i]);
+						for (i = 0, n = 0, ii = linkFns.length; ii > i; n++) 
+							node = stableNodeList[n], 
+							nodeLinkFn = linkFns[i++], 
+							childLinkFn = linkFns[i++], 
+							$node = jqLite(node), 
+							nodeLinkFn 
+								? (nodeLinkFn.scope 
+										? (childScope = scope.$new(), $node.data("$scope", childScope), safeAddClass($node, "ng-scope")) 
+										: childScope = scope, childTranscludeFn = nodeLinkFn.transclude, childTranscludeFn || !boundTranscludeFn && transcludeFn 
+											? nodeLinkFn(childLinkFn, childScope, node, $rootElement, createBoundTranscludeFn(scope, childTranscludeFn || transcludeFn)) 
+											: nodeLinkFn(childLinkFn, childScope, node, undefined, boundTranscludeFn)) 
+								: childLinkFn && childLinkFn(scope, node.childNodes, undefined, boundTranscludeFn)
+					}
+
+					//nodeList时jquery对象，可能多个 因此循环
+					for (var i = 0; i < nodeList.length; i++) 
+						attrs = new Attributes, //创建attr对象
+					//调用collectDirectives收集节点上的所有指令，不递归查子节点的指令
+					directives = collectDirectives(nodeList[i], [], attrs, 0 === i ? maxPriority : undefined, ignoreDirective), 
+					//若指令长度大于0，调用applyDirectivesToNode将指令应用在节点上,并返回nodeLinkFn
+					//获取的是链接函数
+					nodeLinkFn = directives.length 
+					? applyDirectivesToNode(directives, nodeList[i], attrs, transcludeFn, $rootElement, null, [], [], previousCompileContext) : null, 
+
+					//设置子节点的链接方法childLinkFn
+					//若nodeLinkFn为空，值为null
+					//若nodeLinkFn不为空，nodeLinkFn.terminal不为空或当前节点无子节点或子节点长度为0 值为null
+					//若nodeLinkFn不为空，且nodeLinkFn.terminal为空且有子节点，则调用compileNodes编译子节点，返回的是子链接函数
+					////apply的时候会返回一个链接函数，如果有的话则编译子节点，将nodeLinkFn.transclude传进去
+					childLinkFn = nodeLinkFn && nodeLinkFn.terminal 
+					|| !nodeList[i].childNodes 
+					|| !nodeList[i].childNodes.length 
+					? null 
+					: compileNodes(nodeList[i].childNodes, nodeLinkFn ? nodeLinkFn.transclude : transcludeFn), 
+					linkFns.push(nodeLinkFn), //加入节点的链接
+					linkFns.push(childLinkFn), //加入子节点的链接函数
+					//判断是否找到链接函数
+					linkFnFound = linkFnFound || nodeLinkFn || childLinkFn, previousCompileContext = null;
+
+
+					//若找到，返回compositeLinkFn对象。
+					return linkFnFound ? compositeLinkFn : null
+				}
+
+				function createBoundTranscludeFn(scope, transcludeFn) {
+					return function(transcludedScope, cloneFn, controllers) {
+						var scopeCreated = !1;
+						transcludedScope || (transcludedScope = scope.$new(), transcludedScope.$$transcluded = !0, scopeCreated = !0);
+						var clone = transcludeFn(transcludedScope, cloneFn, controllers);
+						return scopeCreated && clone.on("$destroy", bind(transcludedScope, transcludedScope.$destroy)), clone
+					}
+				}
+				//这个过程是收集指令，参数为：
+				//node节点：传入一个节点
+				//directives节点：appElement时空的数组
+				//attr时调用前生成的
+				//maxPriority最大优先级
+				//ignoreDirective忽略的指令
+				function collectDirectives(node, directives, attrs, maxPriority, ignoreDirective) {
+					var match, className, 
+						nodeType = node.nodeType,//1-元素 2-属性 3-文本
+						attrsMap = attrs.$attr;//attrs时这个节点的Attribute对象
+					switch (nodeType) {
+						case 1://这是一个元素节点，判断是否是指令，若是，添加到directives数组。
+							addDirective(directives, directiveNormalize(nodeName_(node).toLowerCase()), "E", maxPriority, ignoreDirective);
+							//遍历元素节点的属性，
+							for (var attr, name, nName, ngAttrName, value, nAttrs = node.attributes, j = 0, jj = nAttrs && nAttrs.length;
+								 jj > j; j++) {
+								var attrStartName = !1,
+									attrEndName = !1;
+								//当前属性为attr，不是IE或IE大于7
+								if (attr = nAttrs[j], !msie || msie >= 8 || attr.specified) {
+									name = attr.name, //属性名
+									ngAttrName = directiveNormalize(name), //驼峰属性名
+									//如果时ngAttr开头的，则转为ngAttr-name
+									NG_ATTR_BINDING.test(ngAttrName) && (name = snake_case(ngAttrName.substr(6), "-"));
+									//删除Start和End
+									var directiveNName = ngAttrName.replace(/(Start|End)$/, "");
+									//
+									ngAttrName === directiveNName + "Start" && (attrStartName = name, attrEndName = name.substr(0, name.length - 5) + "end", 
+									name = name.substr(0, name.length - 6)), 
+									nName = directiveNormalize(name.toLowerCase()), 
+									attrsMap[nName] = name, //加入到属性对象中，保存所有的属性
+									//获取属性的名，设置对应关系
+									attrs[nName] = value = trim(msie && "href" == name ? decodeURIComponent(node.getAttribute(name, 2)) : attr.value), 
+									//如果时布尔属性，转为true和false
+									//布尔属性：multiple,selected,checked,disabled,readOnly,required,open
+									//布尔元素：input,select,option,textarea,button,form,details
+									//若属性在布尔属性中，同时元素也在布尔元素中，返回true
+									getBooleanAttrName(node, nName) && (attrs[nName] = !0), 
+									//如果是{{}}这种情况，则新增一个指令，监听{{}}的变换
+									addAttrInterpolateDirective(node, directives, value, nName), 
+									//判断属性是否为指令，若是 加入directives数组。
+									addDirective(directives, nName, "A", maxPriority, ignoreDirective, attrStartName, attrEndName)
+								}
+							}
+							//如果节点的class不为空
+							if (className = node.className, isString(className) && "" !== className)
+								for (; match = CLASS_DIRECTIVE_REGEXP.exec(className);) 
+									nName = directiveNormalize(match[2]), 
+									//判断是否为指令，若是，加入directives数组。
+									addDirective(directives, nName, "C", maxPriority, ignoreDirective) && (attrs[nName] = trim(match[3])), className = className.substr(match.index + match[0].length);
+							break;
+						case 3://这是一个文本节点，若为{{}}新增指令 监听内容变化
+							addTextInterpolateDirective(directives, node.nodeValue);
+							break;
+						case 8://这是注释节点，如果符合则尝试加入指令
+							try {
+								match = COMMENT_DIRECTIVE_REGEXP.exec(node.nodeValue), match && (nName = directiveNormalize(match[1]), 
+									addDirective(directives, nName, "M", maxPriority, ignoreDirective) && (attrs[nName] = trim(match[2])))
+							} catch (e) {}
+					}
+					//收集了所有的指令，排序
+					return directives.sort(byPriority), directives
+				}
+				//节点，开始属性  结束属性
+				function groupScan(node, attrStart, attrEnd) {
+					var nodes = [],
+						depth = 0;
+					if (attrStart && node.hasAttribute && node.hasAttribute(attrStart)) {
+						do {
+							if (!node) throw $compileMinErr("uterdir", "Unterminated attribute, found '{0}' but no matching '{1}' found.", attrStart, attrEnd);
+							1 == node.nodeType && (node.hasAttribute(attrStart) && depth++, node.hasAttribute(attrEnd) && depth--), nodes.push(node), node = node.nextSibling
+						} while (depth > 0)
+					} else nodes.push(node);
+					return jqLite(nodes)
+				}
+
+				function groupElementsLinkFnWrapper(linkFn, attrStart, attrEnd) {
+					return function(scope, element, attrs, controllers, transcludeFn) {
+						return element = groupScan(element[0], attrStart, attrEnd), linkFn(scope, element, attrs, controllers, transcludeFn)
+					}
+				}
+				//作用：将指令应用到节点上
+				//directives：已收集的指令
+				//compileNode：当前节点
+				function applyDirectivesToNode(directives, compileNode, templateAttrs, transcludeFn, jqCollection, originalReplaceDirective, preLinkFns, postLinkFns, previousCompileContext) {
+					//FUN-1，添加pre和post
+					function addLinkFns(pre, post, attrStart, attrEnd) {
+						pre && (attrStart && (pre = groupElementsLinkFnWrapper(pre, attrStart, attrEnd)), pre.require = directive.require, (newIsolateScopeDirective === directive || directive.$$isolateScope) && (pre = cloneAndAnnotateFn(pre, {
+							isolateScope: !0
+						})), preLinkFns.push(pre)), post && (attrStart && (post = groupElementsLinkFnWrapper(post, attrStart, attrEnd)), post.require = directive.require, (newIsolateScopeDirective === directive || directive.$$isolateScope) && (post = cloneAndAnnotateFn(post, {
+							isolateScope: !0
+						})), postLinkFns.push(post))
+					}
+					//FUN-2 获取控制器
+					function getControllers(require, $element, elementControllers) {
+						var value, retrievalMethod = "data",
+							optional = !1;
+						if (isString(require)) {
+							for (;
+								"^" == (value = require.charAt(0)) || "?" == value;) require = require.substr(1), "^" == value && (retrievalMethod = "inheritedData"), optional = optional || "?" == value;
+							if (value = null, elementControllers && "data" === retrievalMethod && (value = elementControllers[require]), value = value || $element[retrievalMethod]("$" + require + "Controller"), !value && !optional) throw $compileMinErr("ctreq", "Controller '{0}', required by directive '{1}', can't be found!", require, directiveName);
+							return value
+						}
+						return isArray(require) && (value = [], forEach(require, function(require) {
+							value.push(getControllers(require, $element, elementControllers))
+						})), value
+					}
+					//FUN-3 返回的link函数,每个节点的是nodelink函数
+					function nodeLinkFn(childLinkFn, scope, linkNode, $rootElement, boundTranscludeFn) {
+						function controllersBoundTransclude(scope, cloneAttachFn) {
+							var transcludeControllers;
+							return arguments.length < 2 && (cloneAttachFn = scope, scope = undefined), hasElementTranscludeDirective && (transcludeControllers = elementControllers), boundTranscludeFn(scope, cloneAttachFn, transcludeControllers)
+						}
+						var attrs, $element, i, ii, linkFn, controller, isolateScope, transcludeFn, elementControllers = {};
+						if (attrs = compileNode === linkNode ? templateAttrs : shallowCopy(templateAttrs, new Attributes(jqLite(linkNode), templateAttrs.$attr)), $element = attrs.$$element, newIsolateScopeDirective) {
+							var LOCAL_REGEXP = /^\s*([@=&])(\??)\s*(\w*)\s*$/,
+								$linkNode = jqLite(linkNode);
+							isolateScope = scope.$new(!0), templateDirective && templateDirective === newIsolateScopeDirective.$$originalDirective ? $linkNode.data("$isolateScope", isolateScope) : $linkNode.data("$isolateScopeNoTemplate", isolateScope), safeAddClass($linkNode, "ng-isolate-scope"), forEach(newIsolateScopeDirective.scope, function(definition, scopeName) {
+								var lastValue, parentGet, parentSet, match = definition.match(LOCAL_REGEXP) || [],
+									attrName = match[3] || scopeName,
+									optional = "?" == match[2],
+									mode = match[1];
+								switch (isolateScope.$$isolateBindings[scopeName] = mode + attrName, mode) {
+									case "@":
+										attrs.$observe(attrName, function(value) {
+											isolateScope[scopeName] = value
+										}), attrs.$$observers[attrName].$$scope = scope, attrs[attrName] && (isolateScope[scopeName] = $interpolate(attrs[attrName])(scope));
+										break;
+									case "=":
+										if (optional && !attrs[attrName]) return;
+										parentGet = $parse(attrs[attrName]), parentSet = parentGet.assign || function() {
+											throw lastValue = isolateScope[scopeName] = parentGet(scope), $compileMinErr("nonassign", "Expression '{0}' used with directive '{1}' is non-assignable!", attrs[attrName], newIsolateScopeDirective.name)
+										}, lastValue = isolateScope[scopeName] = parentGet(scope), isolateScope.$watch(function() {
+											var parentValue = parentGet(scope);
+											return parentValue !== isolateScope[scopeName] && (parentValue !== lastValue ? lastValue = isolateScope[scopeName] = parentValue : parentSet(scope, parentValue = lastValue = isolateScope[scopeName])), parentValue
+										});
+										break;
+									case "&":
+										parentGet = $parse(attrs[attrName]), isolateScope[scopeName] = function(locals) {
+											return parentGet(scope, locals)
+										};
+										break;
+									default:
+										throw $compileMinErr("iscp", "Invalid isolate scope definition for directive '{0}'. Definition: {... {1}: '{2}' ...}", newIsolateScopeDirective.name, scopeName, definition)
+								}
+							})
+						}
+						for (transcludeFn = boundTranscludeFn && controllersBoundTransclude, controllerDirectives && forEach(controllerDirectives, function(directive) {
+							var controllerInstance, locals = {
+									$scope: directive === newIsolateScopeDirective || directive.$$isolateScope ? isolateScope : scope,
+									$element: $element,
+									$attrs: attrs,
+									$transclude: transcludeFn
+								};
+							controller = directive.controller, "@" == controller && (controller = attrs[directive.name]), controllerInstance = $controller(controller, locals), elementControllers[directive.name] = controllerInstance, hasElementTranscludeDirective || $element.data("$" + directive.name + "Controller", controllerInstance), directive.controllerAs && (locals.$scope[directive.controllerAs] = controllerInstance)
+						}), i = 0, ii = preLinkFns.length; ii > i; i++) try {
+							linkFn = preLinkFns[i], linkFn(linkFn.isolateScope ? isolateScope : scope, $element, attrs, linkFn.require && getControllers(linkFn.require, $element, elementControllers), transcludeFn)
+						} catch (e) {
+							$exceptionHandler(e, startingTag($element))
+						}
+						var scopeToChild = scope;
+						for (newIsolateScopeDirective && (newIsolateScopeDirective.template || null === newIsolateScopeDirective.templateUrl) && (scopeToChild = isolateScope), childLinkFn && childLinkFn(scopeToChild, linkNode.childNodes, undefined, boundTranscludeFn), i = postLinkFns.length - 1; i >= 0; i--) try {
+							linkFn = postLinkFns[i], linkFn(linkFn.isolateScope ? isolateScope : scope, $element, attrs, linkFn.require && getControllers(linkFn.require, $element, elementControllers), transcludeFn)
+						} catch (e) {
+							$exceptionHandler(e, startingTag($element))
+						}
+					}
+					//STEP-0
+					//上下文
+					previousCompileContext = previousCompileContext || {};
+					//
+					var newScopeDirective, 
+					directive, 
+					directiveName, 
+					$template, 
+					linkFn, 
+					directiveValue, 
+					terminalPriority = -Number.MAX_VALUE, 
+					controllerDirectives = previousCompileContext.controllerDirectives, 
+					newIsolateScopeDirective = previousCompileContext.newIsolateScopeDirective, 
+					templateDirective = previousCompileContext.templateDirective, 
+					nonTlbTranscludeDirective = previousCompileContext.nonTlbTranscludeDirective, 
+					hasTranscludeDirective = !1, 
+					hasElementTranscludeDirective = !1, 
+					$compileNode = templateAttrs.$$element = jqLite(compileNode), //节点转为jquery对象
+					replaceDirective = originalReplaceDirective, 
+					childTranscludeFn = transcludeFn,
+					//收集完指令了，directives就是这个节点上所有符合条件的指令，遍历之
+					for (var i = 0, ii = directives.length; ii > i; i++) {
+						directive = directives[i];//当前指令
+						var attrStart = directive.$$start,
+							attrEnd = directive.$$end;
+						if (attrStart && ($compileNode = groupScan(compileNode, attrStart, attrEnd)), 
+							$template = undefined, terminalPriority > directive.priority) 
+							break;//如果指令有$$start，在attrStart和attrEnd之间查找符合条件的属性节点
+						if ((directiveValue = directive.scope) //directive.scope为true,则
+							&& (newScopeDirective = newScopeDirective 
+							|| directive, directive.templateUrl 
+							|| (assertNoDuplicate("new/isolated scope", newIsolateScopeDirective, directive, $compileNode),
+								//若directive.scope是一个对象，name设置隔离scope
+								isObject() && (newIsolateScopeDirective = directive))), 
+							directiveName = directive.name, //指令名
+							!directive.templateUrl && directive.controller 
+								&& (directiveValue = directive.controller, 
+									controllerDirectives = controllerDirectives || {}, 
+									assertNoDuplicate("'" + directiveName + "' controller",
+									controllerDirectives[directiveName], directive, $compileNode), 
+									controllerDirectives[directiveName] = directive), 
+								(directiveValue = directive.transclude) && 
+								(hasTranscludeDirective = !0, 
+									directive.$$tlb || (assertNoDuplicate("transclusion", 
+									nonTlbTranscludeDirective, directive, $compileNode),
+								nonTlbTranscludeDirective = directive), 
+								"element" == directiveValue 
+								? (hasElementTranscludeDirective = !0, 
+									terminalPriority = directive.priority, 
+									$template = groupScan(compileNode, attrStart, attrEnd), 
+									$compileNode = templateAttrs.$$element = jqLite(document.createComment(" " + directiveName + ": " + templateAttrs[directiveName] + " ")), 
+									compileNode = $compileNode[0], 
+									replaceWith(jqCollection, jqLite(sliceArgs($template)), compileNode), 
+									//编译模板
+									childTranscludeFn = compile($template, transcludeFn, terminalPriority, replaceDirective && replaceDirective.name, {
+									nonTlbTranscludeDirective: nonTlbTranscludeDirective
+									})) 
+								: ($template = jqLite(jqLiteClone(compileNode)).contents(), 
+									$compileNode.html(""), 
+									childTranscludeFn = compile($template, transcludeFn))
+								), 
+								directive.template)
+
+							if (assertNoDuplicate("template", templateDirective, directive, $compileNode), 
+									templateDirective = directive, 
+									directiveValue = isFunction(directive.template) ? directive.template($compileNode, templateAttrs) : directive.template, 
+									directiveValue = denormalizeTemplate(directiveValue), directive.replace)
+								{
+									if (replaceDirective = directive, 
+										$template = jqLite("<div>" + trim(directiveValue) + "</div>").contents(), 
+										compileNode = $template[0], 
+										1 != $template.length || 1 !== compileNode.nodeType) 
+											throw $compileMinErr("tplrt", "Template for directive '{0}' must have exactly one root element. {1}", directiveName, "");
+									replaceWith(jqCollection, $compileNode, compileNode);
+									var newTemplateAttrs = {
+										$attr: {}
+									}, 
+									templateDirectives = collectDirectives(compileNode, [], newTemplateAttrs),
+									unprocessedDirectives = directives.splice(i + 1, directives.length - (i + 1));
+									newIsolateScopeDirective && markDirectivesAsIsolate(templateDirectives), 
+									directives = directives.concat(templateDirectives).concat(unprocessedDirectives), 
+									mergeTemplateAttributes(templateAttrs, newTemplateAttrs), 
+									ii = directives.length
+							} 
+							else 
+								$compileNode.html(directiveValue);
+
+						if (directive.templateUrl) 
+							assertNoDuplicate("template", templateDirective, directive, $compileNode), 
+							templateDirective = directive, 
+							directive.replace && (replaceDirective = directive), 
+							nodeLinkFn = compileTemplateUrl(directives.splice(i, directives.length - i), $compileNode, templateAttrs, jqCollection, childTranscludeFn, preLinkFns, postLinkFns, {
+								controllerDirectives: controllerDirectives,
+								newIsolateScopeDirective: newIsolateScopeDirective,
+								templateDirective: templateDirective,
+								nonTlbTranscludeDirective: nonTlbTranscludeDirective
+								}), 
+							ii = directives.length;
+						else if (directive.compile) 
+							try {
+								linkFn = directive.compile($compileNode, templateAttrs, childTranscludeFn), isFunction(linkFn) ? addLinkFns(null, linkFn, attrStart, attrEnd) : linkFn && addLinkFns(linkFn.pre, linkFn.post, attrStart, attrEnd)
+							} catch (e) {
+								$exceptionHandler(e, startingTag($compileNode))
+							}
+						directive.terminal && (nodeLinkFn.terminal = !0, terminalPriority = Math.max(terminalPriority, directive.priority))
+					}
+					nodeLinkFn.scope = newScopeDirective && newScopeDirective.scope === !0, 
+					nodeLinkFn.transclude = hasTranscludeDirective && childTranscludeFn, 
+					return nodeLinkFn;
+				}
+				//-------------------------------
+
+				function markDirectivesAsIsolate(directives) {
+					for (var j = 0, jj = directives.length; jj > j; j++) directives[j] = inherit(directives[j], {
+						$$isolateScope: !0
+					})
+				}
+				//作用：查找是否符合指令，并添加指令到数组
+				//tDirectives：指令数组，节点中所有符合的指令都保存在这个数组内
+				//name：指令名称
+				//location：EAC
+				//maxPriority:最大优先级
+				//ignoreDirective:忽略的指令
+				//
+				//
+				function addDirective(tDirectives, name, location, maxPriority, ignoreDirective, startAttrName, endAttrName) {
+					if (name === ignoreDirective) return null;//若忽略，返回null
+					var match = null;
+					if (hasDirectives.hasOwnProperty(name))//所有指令都保存在$CompileProvider的hasDirectives数组中
+						//如果有，则获取$aDirective指令的实例对象，遍历之（一个标签A可能有多个指令）
+						for (var directive, directives = $injector.get(name + Suffix), i = 0, ii = directives.length; ii > i; i++) 
+							try {
+							directive = directives[i], //获取指令对象
+							//maxPriority不为空则指令对象的priority需要小于最大，
+							//restrict在location的范围内,如指令设置为"EAC",但location不在 则不继续
+							//startAttrName不为空，则directive设置为继承
+							//将指令放入tDirectives数组，返回这个指令对象。
+							(maxPriority === undefined || maxPriority > directive.priority) 
+							&& -1 != directive.restrict.indexOf(location) 
+							&& (startAttrName && (directive = inherit(directive, {
+								$$start: startAttrName,
+								$$end: endAttrName
+								})), tDirectives.push(directive), match = directive)
+						} catch (e) {
+							$exceptionHandler(e)
+						}
+					return match//最后返回的是A标签最后一个指令
+				}
+
+				function mergeTemplateAttributes(dst, src) {
+					var srcAttr = src.$attr,
+						dstAttr = dst.$attr,
+						$element = dst.$$element;
+					forEach(dst, function(value, key) {
+						"$" != key.charAt(0) && (src[key] && (value += ("style" === key ? ";" : " ") + src[key]), dst.$set(key, value, !0, srcAttr[key]))
+					}), forEach(src, function(value, key) {
+						"class" == key ? (safeAddClass($element, value), dst["class"] = (dst["class"] ? dst["class"] + " " : "") + value) : "style" == key ? ($element.attr("style", $element.attr("style") + ";" + value), dst.style = (dst.style ? dst.style + ";" : "") + value) : "$" == key.charAt(0) || dst.hasOwnProperty(key) || (dst[key] = value, dstAttr[key] = srcAttr[key])
+					})
+				}
+
+				function compileTemplateUrl(directives, $compileNode, tAttrs, $rootElement, childTranscludeFn, preLinkFns, postLinkFns, previousCompileContext) {
+					var afterTemplateNodeLinkFn, afterTemplateChildLinkFn, linkQueue = [],
+						beforeTemplateCompileNode = $compileNode[0],
+						origAsyncDirective = directives.shift(),
+						derivedSyncDirective = extend({}, origAsyncDirective, {
+							templateUrl: null,
+							transclude: null,
+							replace: null,
+							$$originalDirective: origAsyncDirective
+						}),
+						templateUrl = isFunction(origAsyncDirective.templateUrl) ? origAsyncDirective.templateUrl($compileNode, tAttrs) : origAsyncDirective.templateUrl;
+					return $compileNode.html(""), $http.get($sce.getTrustedResourceUrl(templateUrl), {
+						cache: $templateCache
+					}).success(function(content) {
+						var compileNode, tempTemplateAttrs, $template, childBoundTranscludeFn;
+						if (content = denormalizeTemplate(content), origAsyncDirective.replace) {
+							if ($template = jqLite("<div>" + trim(content) + "</div>").contents(), compileNode = $template[0], 1 != $template.length || 1 !== compileNode.nodeType) throw $compileMinErr("tplrt", "Template for directive '{0}' must have exactly one root element. {1}", origAsyncDirective.name, templateUrl);
+							tempTemplateAttrs = {
+								$attr: {}
+							}, replaceWith($rootElement, $compileNode, compileNode);
+							var templateDirectives = collectDirectives(compileNode, [], tempTemplateAttrs);
+							isObject(origAsyncDirective.scope) && markDirectivesAsIsolate(templateDirectives), directives = templateDirectives.concat(directives), mergeTemplateAttributes(tAttrs, tempTemplateAttrs)
+						} else compileNode = beforeTemplateCompileNode, $compileNode.html(content);
+						for (directives.unshift(derivedSyncDirective), afterTemplateNodeLinkFn = applyDirectivesToNode(directives, compileNode, tAttrs, childTranscludeFn, $compileNode, origAsyncDirective, preLinkFns, postLinkFns, previousCompileContext), forEach($rootElement, function(node, i) {
+							node == compileNode && ($rootElement[i] = $compileNode[0])
+						}), afterTemplateChildLinkFn = compileNodes($compileNode[0].childNodes, childTranscludeFn); linkQueue.length;) {
+							var scope = linkQueue.shift(),
+								beforeTemplateLinkNode = linkQueue.shift(),
+								linkRootElement = linkQueue.shift(),
+								boundTranscludeFn = linkQueue.shift(),
+								linkNode = $compileNode[0];
+							beforeTemplateLinkNode !== beforeTemplateCompileNode && (linkNode = jqLiteClone(compileNode), replaceWith(linkRootElement, jqLite(beforeTemplateLinkNode), linkNode)), childBoundTranscludeFn = afterTemplateNodeLinkFn.transclude ? createBoundTranscludeFn(scope, afterTemplateNodeLinkFn.transclude) : boundTranscludeFn, afterTemplateNodeLinkFn(afterTemplateChildLinkFn, scope, linkNode, $rootElement, childBoundTranscludeFn)
+						}
+						linkQueue = null
+					}).error(function(response, code, headers, config) {
+						throw $compileMinErr("tpload", "Failed to load template: {0}", config.url)
+					}),
+					function(ignoreChildLinkFn, scope, node, rootElement, boundTranscludeFn) {
+						linkQueue ? (linkQueue.push(scope), linkQueue.push(node), linkQueue.push(rootElement), linkQueue.push(boundTranscludeFn)) : afterTemplateNodeLinkFn(afterTemplateChildLinkFn, scope, node, rootElement, boundTranscludeFn)
+					}
+				}
+
+				function byPriority(a, b) {
+					var diff = b.priority - a.priority;
+					return 0 !== diff ? diff : a.name !== b.name ? a.name < b.name ? -1 : 1 : a.index - b.index
+				}
+
+				function assertNoDuplicate(what, previousDirective, directive, element) {
+					if (previousDirective) throw $compileMinErr("multidir", "Multiple directives [{0}, {1}] asking for {2} on: {3}", previousDirective.name, directive.name, what, startingTag(element))
+				}
+
+				//文本节点，调用该方法，若为{{}}文本，新增指令
+				//directives：指令数组
+				//text：文本值
+				function addTextInterpolateDirective(directives, text) {
+					var interpolateFn = $interpolate(text, !0);//
+					interpolateFn && directives.push({
+						priority: 0,
+						compile: valueFn(function(scope, node) {
+							var parent = node.parent(),
+								bindings = parent.data("$binding") || [];
+							bindings.push(interpolateFn), safeAddClass(parent.data("$binding", bindings), "ng-binding"), 
+							scope.$watch(interpolateFn, function(value) {
+								node[0].nodeValue = value
+							})
+						})
+					})
+				}
+
+				function getTrustedContext(node, attrNormalizedName) {
+					return "xlinkHref" == attrNormalizedName || "IMG" != nodeName_(node) && ("src" == attrNormalizedName || "ngSrc" == attrNormalizedName) ? $sce.RESOURCE_URL : void 0
+				}
+				//作用：
+				//node：节点
+				//directives：目前已发现的指令
+				//value：属性值
+				//name：属性名
+				//				
+				function addAttrInterpolateDirective(node, directives, value, name) {
+					var interpolateFn = $interpolate(value, !0);//解析一下属性的值
+					if (interpolateFn) {
+						if ("multiple" === name && "SELECT" === nodeName_(node)) throw $compileMinErr("selmulti", "Binding to the 'multiple' attribute is not supported. Element: {0}", startingTag(node));
+						//符合条件，则加入一个指令
+						directives.push({
+							priority: 100,
+							compile: function() {
+								return {
+									pre: function(scope, element, attr) {
+										var $$observers = attr.$$observers || (attr.$$observers = {});
+										//若属性值时on则抛错
+										//加入监听{{}}内的值
+										if (EVENT_HANDLER_ATTR_REGEXP.test(name)) throw $compileMinErr("nodomevents", "Interpolations for HTML DOM event attributes are disallowed.  Please use the ng- versions (such as ng-click instead of onclick) instead.");
+										interpolateFn = $interpolate(attr[name], !0, 
+											getTrustedContext(node, name)), 
+											interpolateFn && (attr[name] = interpolateFn(scope), 
+															($$observers[name] || ($$observers[name] = [])).$$inter = !0, 
+															(attr.$$observers && attr.$$observers[name].$$scope || scope).$watch(interpolateFn, function(value) {
+											attr.$set(name, value)
+										}
+										))
+									}
+								}
+							}
+						})
+					}
+				}
+
+				function replaceWith($rootElement, elementsToRemove, newNode) {
+					var i, ii, firstElementToRemove = elementsToRemove[0],
+						removeCount = elementsToRemove.length,
+						parent = firstElementToRemove.parentNode;
+					if ($rootElement)
+						for (i = 0, ii = $rootElement.length; ii > i; i++)
+							if ($rootElement[i] == firstElementToRemove) {
+								$rootElement[i++] = newNode;
+								for (var j = i, j2 = j + removeCount - 1, jj = $rootElement.length; jj > j; j++, j2++) jj > j2 ? $rootElement[j] = $rootElement[j2] : delete $rootElement[j];
+								$rootElement.length -= removeCount - 1;
+								break
+							}
+					parent && parent.replaceChild(newNode, firstElementToRemove);
+					var fragment = document.createDocumentFragment();
+					fragment.appendChild(firstElementToRemove), newNode[jqLite.expando] = firstElementToRemove[jqLite.expando];
+					for (var k = 1, kk = elementsToRemove.length; kk > k; k++) {
+						var element = elementsToRemove[k];
+						jqLite(element).remove(), fragment.appendChild(element), delete elementsToRemove[k]
+					}
+					elementsToRemove[0] = newNode, elementsToRemove.length = 1
+				}
+
+				function cloneAndAnnotateFn(fn, annotation) {
+					return extend(function() {
+						return fn.apply(null, arguments)
+					}, fn, annotation)
+				}
+				var Attributes = function(element, attr) {
+					this.$$element = element, this.$attr = attr || {}
+				};
+
+				//Attributes对象
+				//normalize属性，处理指令的驼峰化
+				//$addClass,添加类
+				//$removeClass 移除类
+				//Attributes类
+				//$$element 当前元素
+				//$attr 属性
+				//$addClass新增类
+				//$removeClass移出类
+				//$set 设置属性
+				//$$observers保存了监听变量和函数
+				//$observe添加监听
+				Attributes.prototype = {
+					$normalize: directiveNormalize,
+					$addClass: function(classVal) {
+						classVal && classVal.length > 0 && $animate.addClass(this.$$element, classVal)
+					},
+					$removeClass: function(classVal) {
+						classVal && classVal.length > 0 && $animate.removeClass(this.$$element, classVal)
+					},
+					$set: function(key, value, writeAttr, attrName) {
+						function tokenDifference(str1, str2) {
+							var values = [],
+								tokens1 = str1.split(/\s+/),
+								tokens2 = str2.split(/\s+/);
+							outer: for (var i = 0; i < tokens1.length; i++) {
+								for (var token = tokens1[i], j = 0; j < tokens2.length; j++)
+									if (token == tokens2[j]) continue outer;
+								values.push(token)
+							}
+							return values
+						}
+						if ("class" == key) {
+							value = value || "";
+							var current = this.$$element.attr("class") || "";
+							this.$removeClass(tokenDifference(current, value).join(" ")), this.$addClass(tokenDifference(value, current).join(" "))
+						} else {
+							var normalizedVal, nodeName, booleanKey = getBooleanAttrName(this.$$element[0], key);
+							booleanKey && (this.$$element.prop(key, value), attrName = booleanKey), this[key] = value, attrName ? this.$attr[key] = attrName : (attrName = this.$attr[key], attrName || (this.$attr[key] = attrName = snake_case(key, "-"))), nodeName = nodeName_(this.$$element), ("A" === nodeName && "href" === key || "IMG" === nodeName && "src" === key) && (!msie || msie >= 8) && (normalizedVal = urlResolve(value).href, "" !== normalizedVal && ("href" === key && !normalizedVal.match(aHrefSanitizationWhitelist) || "src" === key && !normalizedVal.match(imgSrcSanitizationWhitelist)) && (this[key] = value = "unsafe:" + normalizedVal)), writeAttr !== !1 && (null === value || value === undefined ? this.$$element.removeAttr(attrName) : this.$$element.attr(attrName, value))
+						}
+						var $$observers = this.$$observers;
+						$$observers && forEach($$observers[key], function(fn) {
+							try {
+								fn(value)
+							} catch (e) {
+								$exceptionHandler(e)
+							}
+						})
+					},
+					$observe: function(key, fn) {
+						var attrs = this,
+							$$observers = attrs.$$observers || (attrs.$$observers = {}),
+							listeners = $$observers[key] || ($$observers[key] = []);
+						return listeners.push(fn), $rootScope.$evalAsync(function() {
+							listeners.$$inter || fn(attrs[key])
+						}), fn
+					}
+				};
+
+
+
+				var startSymbol = $interpolate.startSymbol(),
+					endSymbol = $interpolate.endSymbol(),
+					denormalizeTemplate = "{{" == startSymbol || "}}" == endSymbol ? identity : function(template) {
+						return template.replace(/\{\{/g, startSymbol).replace(/}}/g, endSymbol)
+					}, NG_ATTR_BINDING = /^ngAttr[A-Z]/;
+				return compile;
+			}
+		]
+	}

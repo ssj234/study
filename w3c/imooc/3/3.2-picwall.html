@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>SHADOW</title>
+<link href="../../global/css/common.css" rel="stylesheet"/>
+<link href="../../jfunUI/css/jfun_tooltip.css" rel="stylesheet"/>
+<style>
+	img
+	{
+		width: 200px;
+		height: 130px;
+		border:5px solid #fff;
+		box-shadow: 0px 0px 10px 0px #ddd;
+		-webkit-transition:all 0.5s linear 0.1s;
+	}
+	img:hover
+	{
+		width: 200px;
+		height: 130px;
+		border:5px solid #fff;
+		z-index: 2;
+		position: relative;
+		box-shadow: 0px 0px 10px 0px red;
+		-webkit-transform:rotate(0deg) scale(1.2,1.2);
+		-webkit-transition:all 0.5s linear 0.1s;
+	}
+	#imgwall{
+		box-shadow: 0px 0px 10px 0px red;
+		width: 50%;
+		height: 100%;
+		background-color:cyan;
+		margin:0px auto;
+		padding:  100px 
+	}
+</style>
+</head>
+<body>
+
+<div class="block">
+	<div class="head">图片墙</div>
+	<ul>
+		<li>图片墙制作<br/>
+		1.初始位置的设定</br>
+		初始位置设置了随机数生产的选择角度 [-20,20]，并使用data-deg记录了初始角度</br>
+		hover时，旋转至0度（首先移除了-webkit-transform属性，不然无法生效）</br>
+		<pre>
+			
+		</pre></li>
+		
+	</ul>
+	<div class="example" style="position:relative;">
+		<div id="imgwall">
+			<img src="images/Lighthouse.jpg"/>
+			<img src="images/Penguins.jpg"/>
+			<img src="images/Tulips.jpg"/>
+			<img src="images/Lighthouse.jpg"/>
+			<img src="images/Penguins.jpg"/>
+			<img src="images/Tulips.jpg"/>
+		</div>
+	</div>
+</div>
+
+<script language="javascript" src="js/jquery.js"></script>
+<script language="javascript" src="../../jfunUI/js/jquery.jfun.tooltip.js"></script>
+<script>
+
+	$("#imgwall img").each(function(){
+		var i=(Math.random()-5)%1*Math.random()*20;
+		$(this).css("-webkit-transform","rotate("+i+"deg)");//
+		$(this).attr("data-deg",i);
+	});
+	$("#imgwall img").hover(function(){
+		$(this).css("-webkit-transform","");//
+	},function(){
+		$(this).css("-webkit-transform","rotate("+$(this).attr("data-deg")+"deg)");//
+	});
+</script>
+</body>
+</html>

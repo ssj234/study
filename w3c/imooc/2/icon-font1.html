@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>ICON font-1</title>
+	<link rel="stylesheet" type="text/css" href="css/basic.css">
+	<link href="../../global/css/common.css" rel="stylesheet"/>
+	<style type="text/css">
+	@font-face{
+		font-family: "my-icon";
+		src:url("./moon/fonts/icomoon.eot?5f5zf8");
+		src:url("./moon/fonts/icomoon.eot?#iefix?5f5zf8") format("embedded-opentype"),
+		url("./moon/fonts/icomoon.woff?5f5zf8") format("woff"),
+		url("./moon/fonts/icomoon.ttf?5f5zf8") format("truetype"),
+		url("./moon/fonts/icomoon.svg?5f5zf8#icomoon") format("svg");
+		font-weight: normal;
+		font-style: normal;
+	}
+	s{
+		font-family: my-icon;
+		color: #fff;
+		height: 40px;
+		width: 40px;
+		float: left;
+		font-size: 24px;
+		line-height: 40px;
+		padding-left: 8px;
+		-webkit-font-smoothing: antialiased;
+	 	-moz-osx-font-smoothing: grayscale;
+	 	  text-decoration: none;
+	}
+	.sprite li{
+		height: 40px;
+		width: 240px;
+		background-color: #b51600;
+		cursor: pointer;
+	}
+	.sprite li a{
+		height: 40px;
+		width: 240px;
+		color: #fff;
+		line-height: 40px;
+	}
+	.sprite li:hover{
+		background-color: #fff;
+	}
+	.sprite li:hover a{
+		color: #b51600;
+	}
+	body{
+			margin: 8px;
+		}
+	</style>
+</head>
+<body>
+<div class="block">
+<div class="head">Font-ICON</div>
+<ul>
+		<li>1、首先要有字体图标文件，推荐一个网站icomoon，可以选择图标并下载为字体文件</li>
+		<li>2、字体文件：<br/>
+		eot、svg、ttf、woff<br/></li>
+		<li>3、引入字体：<br/>
+		@font-face{<br/>
+		font-family: "my-icon";<br/>
+		src:url("./moon/fonts/icomoon.eot?5f5zf8");<br/>
+		src:url("./moon/fonts/icomoon.eot<b>?</b>#iefix?5f5zf8") format("embedded-opentype"),<br/>
+		url("./moon/fonts/icomoon.woff?5f5zf8") format("woff"),<br/>
+		url("./moon/fonts/icomoon.ttf?5f5zf8") format("truetype"),<br/>
+		url("./moon/fonts/icomoon.svg?5f5zf8#icomoon") format("svg");<br/>
+		font-weight: normal;<br/>
+		font-style: normal;<br/>
+		}
+		</li>
+		<li>4、HTML中使用<br/>
+		&lt;s class="s-icon"&gt;& #xe902;&lt;/s&gt;(无空格)</li>
+		<li>使用字体作为ICON后，可以使用字体相关的CSS对其进行处理</li>
+	</ul>
+<div class="example">
+ <ul class="sprite">
+ 	<li>
+ 		<s class="s-icon ">&#xe917;</s>
+ 		<a href="">This is 1</a>
+ 	</li>
+ 	<li>
+ 		<s class="s-icon">&#xe910;</s>
+ 		<a href="">This is 1</a>
+ 	</li>
+ 	<li>
+ 		<s class="s-icon">&#xe91a;</s>
+ 		<a href="">This is 1</a>
+ 	</li>
+ 	<li>
+ 		<s class="s-icon">&#xe902;</s>
+ 		<a href="">This is 1</a>
+ 	</li>
+ </ul>
+ </div>
+</div>
+ <script type="text/javascript" src="js/jquery.min.js"></script>
+ <script type="text/javascript">
+ $(".sprite .s-icon").each(function(i) {
+ 	var y=-(i*40);
+ 	$(this).css("background-position-y",y+"px");
+ });
+ $(".sprite li").hover(function(){
+ 	$(this).find(".s-icon").css("color","#b51600");
+ },function(){
+ 	$(this).find(".s-icon").css("color","#fff");
+ });
+ </script>
+</body>
+</html>

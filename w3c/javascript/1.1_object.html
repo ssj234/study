@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>javascript-对象</title>
+<link href="../global/css/common.css" rel="stylesheet"/>
+<link href="../jfunUI/css/jfun_tooltip.css" rel="stylesheet"/>
+<style>
+.origin{
+	width:200px;
+	height:200px;
+	border:1px dashed red;
+	margin:100px;
+}
+.transform{
+	width:198px;
+	height:198px;
+	background:grey;
+	position:absolute;
+	top:21px;
+	left:22px;
+	margin:100px;
+	opacity:0.8;
+}
+.example{
+	position:relative;
+}
+</style>
+</head>
+<body>
+<div class="block">
+	<div class="head">JS对象</div>
+	<ul>
+		<li>new运算符</li>
+		<li>1、rotate(xdeg)	旋转x度，在二维空间内变形。<br/></li>
+	</ul>
+	<div class="example">
+		<div class="origin"></div>
+		<div class="transform" id="rotateDIV"></div>
+		<input type="button" id="rotate" name="rotate" value="rotate" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="旋转45度" jfun_content="$id.css(‘transform’,‘rotate(20deg)’);"/>
+	</div>
+</div>
+
+<script language="javascript" src="../global/js/jquery.js"></script>
+<script language="javascript" src="../jfunUI/js/jquery.jfun.tooltip.js"></script>
+<script>
+/*function outerFunc (base) {
+	var punc="!";
+
+	return function(ext){
+		return base+ext+punc;
+	}
+}
+function processNested(){
+	var basestring=outerFunc("Hello ");
+
+	var newString=basestring("World");
+	alert(newString);
+
+	var notherString=basestring("Reader");
+	alert(newString);
+
+	alert(notherString);
+
+
+	var anotherBase=outerFunc("Hiya, Hey ");
+	var lastString=anotherBase("Reader");
+	alert(newString);
+
+	alert(lastString);
+}
+processNested();*/
+
+/*function dog(name){
+	this.name=name;
+}
+var da=new dog("bigm1");
+var db=new dog("bigm2");
+dog.prototype.species="cat";
+da.species="dog";
+alert(da.species);
+alert(db.species);*/
+
+function Animal(){
+	this.type="动物";
+	alert("Animal");
+}
+Animal.prototype.elem=function(){};
+function Cat (name,color) {
+	 //Animal.apply(this,arguments);
+	this.name=name;
+	this.color=color;
+}
+Cat.prototype.type="猫咪";
+var cat1=new Cat("大毛","黄色");
+var cat2=new Cat("小毛","黑色");
+//1.isPrototypeOf
+//Cat是否为cat1的原型对象  Cat.prototype是cat1的原型对象
+//alert(Cat.isPrototypeOf(cat1)+"  "+Cat.prototype.isPrototypeOf(cat1));
+//2.hasOwnProperty
+//判断实例的一个属性是本地属性还是继承自prototype的属性
+//name是本地属性返回true
+//alert(cat1.hasOwnProperty("name")+"  "+cat1.hasOwnProperty("type"));
+//3.in
+//判断实例是否包含某个属性
+//alert("type" in cat1);
+//遍历某个对象的所有属性,输出:cat1[name]=大毛 cat1[color]=黄色 cat1[type]=type
+// for(var prop in cat1)
+// {
+// 	document.writeln("cat1["+prop+"]="+cat1[prop]);
+// }
+
+//继承的方法
+//1.Cat构造函数中  Animal.apply(this,arguments);
+//这种方法在调用构造函数时，指向Animal的构造函数实现，原型链没有改变,cat1.elem是没有的，这可不行
+//2.prototype属性
+//如果Cat的prototype对象，指向一个Amimal的实例，那么所有Cat的实例，就能继承Amimal了
+//Cat.prototype=new Animal();//原型的prototype为Animal的实例，实例没有constructor，会想Animal的prototype的constructor，这样值调用Animal
+//Cat.prototype.constructor=Cat;//修改Cat.prototype的constructor，会调用Cat,不会指向Animal构造函数
+//3
+//
+Cat.prototype=Animal.prototype;
+Cat.prototype.constructor=Cat;
+cat1=new Cat("大毛1","黄色1");
+</script>
+</body>
+</html>

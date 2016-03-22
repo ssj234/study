@@ -1,0 +1,131 @@
+<html>
+<head>
+	<title>angular</title>
+	<meta charset=utf-8>
+	<link href="../global/css/common.css" rel="stylesheet"/>
+	<link href="../jfunUI/css/jfun_tooltip.css" rel="stylesheet"/>
+	<script language="javascript" src="js/jquery.js"></script>
+	<script language="javascript" src="js/angular.js"></script>
+</head>
+<body>
+<div class="block" ng-app="myApp">
+	<div class="head">Injector</div>
+	<ul>
+		<li>injector的使用<br/>
+		<h3>ngModel</h3>
+		1.ngModel是一个用法特殊的指令，它提供更底层的API来处理控制器内的数据。ngModel控制器会随ngModel被一直注入到指令中，其中包含了一些方法。为了访问ngModelController必须使用require设置。</br>
+		2.这个指令没有隔离作用域。如果给这个指令设置隔离作用域，将导致内部ngModel无法更新外部ngModel的对应值：AngularJS会在本地作用域以外查询值。</br>
+		3.为了设置作用域中的视图值，需要调用ngModel.$setViewValue()函数。ngModel.$setViewValue()函数可以接受一个参数。这个方法会更新控制器上本地的$viewValue，然后将值传递给每一个$parser函数,当值被解析，且$parser流水线中所有的函数都调用完成后，值会被赋给$modelValue属性，
+并且传递给指令中ng-model属性提供的表达式,最后，所有步骤都完成后，$viewChangeListeners中所有的监听器都会被调用。</br>
+		3.$setViewValue()方法适合于在自定义指令中监听自定义事件,在回调时设置$viewValue并执行digest循环。</br>
+		3.$render方法可以定义视图具体的渲染方式</br>
+		3.$viewValue属性保存着更新视图所需的实际字符串。</br>
+		3.$modelValue由数据模型持有</br>
+		<h3>$parsers</h3>
+		$parsers值是一个由函数组成的数组，其中的函数会以流水线的形式被逐一调用。ngModel从DOM中读取的值会被传入$parsers中的函数，并依次被其中的解析器处理。</br>
+		当用户同控制器进行交互，并且ngModelController中的$setViewValue()方法被调用时，$parsers数组中的函数会以流水线的形式被逐个调用。第一个$parse被调用后，执行结果会传递给第二个$parse，以此类推。</br>
+		使用$parsers数组是实现自定义验证的途径之一。
+		<pre>
+			ngModel.$parsers.unshift(
+				function(viewValue) {
+					var i = parseInt(viewValue);
+					return i;
+				});
+		</pre>
+		<h3>$formatters</h3>
+		$formatters的值是一个由函数组成的数组，其中的函数会以流水线的形式在数据模型的值发生变化时被逐一调用。它和$parser流水线互不影响，用来对值进行格式化和转换，以便在绑定了这个值的控件中显示。</br>
+		当绑定的ngModel值发生了变化，并经过$parsers数组中解析器的处理后，这个值会被传递给$formatters流水线。同$parsers数组可以修改表单的合法性状态类似，$formatters中的函数也可以修改并格式化这些值。</br>
+		比起单纯的验证目的，这些函数更常用来处理视图中的可视变化。</br>
+		<h3>$viewChangeListeners</h3>
+		$viewChangeListeners的值是一个由函数组成的数组，其中的函数会以流水线的形式在视图中的值发生变化时被逐一调用。</br>
+		<pre>
+			
+		</pre></li>
+	</ul>
+	<input type="text" ng-model="name" my-directive="" err-function="errfun"/>{{name}}</br>
+	<button name="aaa" value='ddd' ng-click="get();">get</button>
+	<button name="aaa" value='ddd' ng-click="set();">set</button>
+	<div ng-switch on="showFlag">
+	   <div ng-switch-when='1'>hehe this is show-1</div>
+	   <div ng-switch-when='2'>hehe this is show-2</div>
+	   <div ng-switch-when='3'>hehe this is show-3</div>
+	   <div ng-switch-default>hehe this is ng-switch-default</div>
+	</div>
+</div>
+<script>
+    var app=angular.module('myApp',[]);
+    app.run(function($rootScope,$interpolate){
+    	$rootScope.name="12";
+    	$rootScope.age="12";
+    	$rootScope.alert=alert;
+    	$rootScope.get=function(){
+    		alert($rootScope.name+"   "+$rootScope.age);
+    		$rootScope.showFlag=3;
+    	};
+    	$rootScope.set=function(){
+    		$rootScope.name="123";
+    		$rootScope.age="123";
+    	};
+    	$rootScope.showFlag=true;
+    	$rootScope.errfun=function(){
+    	alert("1111");
+    	};
+    	
+    	console.log($interpolate("{{name+' & '+age}}")($rootScope));
+    });
+    //指令做的简单一些吧
+    //为ng-model设置不同的值
+    //integer  输入的不为integer时，弹出提示框，需要设置err-function
+    //功能: 1.双向数据绑定 2.输入异常字符，弹出提示（方法） 并回复原来的字符
+    //
+    /*app.directive('myDirective',["$timeout",function($timeout){
+		return {
+			restrict:'A',
+			require: '?ngModel',
+			scope:{
+				errFunction:'&errFunction'
+			},
+			link: function($scope, ele, attrs, ngModel) {
+				var rightLast=ngModel.$modelValue||"0";//最近正确的值
+				if (!ngModel) return;
+				
+				ngModel.$viewChangeListeners=[function(){
+					if(!/^[0-9]*[1-9][0-9]*$/.test(ngModel.$viewValue))
+					{
+						if(ngModel.$viewValue.length==1)
+							rightLast=0;
+						ele.val(rightLast);
+						$timeout(function(){
+						    $scope.$apply(function() {
+							  ngModel.$setViewValue(rightLast);
+						    });
+						});
+					}else{
+						//right=ngModel.$viewValue;
+						rightLast=parseInt(ngModel.$viewValue);
+					}
+					ngModel.$parsers.unshift(
+						function(viewValue) {
+							var i = parseInt(viewValue);
+							return i;
+						});
+				}];
+			}
+		};
+		}]);
+		app.directive('myDirect',function(){
+		return {
+			restrict:'A',
+			link: function($scope, ele, attrs, ngModel) {
+				ele.bind("change",function(){
+				    var t=ele.val();
+				    if(!/^[0-9]*[1-9][0-9]*$/.test(t)){
+				    ele.val(0);
+					}
+				});
+			}
+		};
+	});*/
+</script>
+</body>
+</html>

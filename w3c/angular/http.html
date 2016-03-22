@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>AngularJS之$http</title>   
+        <!-- Bootstrap -->
+        <link href="../global/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../jfunUI/css/jfun_tooltip.css" rel="stylesheet">        
+        <!-- 以下两个插件用于在IE8以及以下版本浏览器支持HTML5元素和媒体查询，如果不需要用可以移除 -->
+        <!--[if lt IE 9]>
+        <script src="../global/js/html5shiv.js"></script>
+        <script src="../global/js/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body style="margin:5px 10px" ng-app="MyApp">
+        <div class="panel panel-primary">
+            <div class="panel-heading">$http-API</div>        
+            <div class="panel-body">
+                <p><code>GET:$http.get(url,config)</code> 发送get请求</p>
+                <p><code>POST:$http.post(url,data,config)</code> 发送post请求</p>
+                <p><code>DELETE:$http.delete(url,config)</code> 发送delete请求</p>
+                <p><code>JSONP:$http.jsonp(url,config)</code> 发送jsonp请求[参数字段加入callback，后台获取后使用callback({数据对象})]返回,框架调用这个方法获取数据；<b>JSONP不触发XHR请求</b></p>
+                <p><code>$http(configObject)</code>更通用的方式</p>
+                <p>
+                    
+                    <table>
+                        <tr>
+                            <td colspan="2">配置对象说明</td>
+                        </tr>
+                        <tr><td><kbd>method</kbd></td><td>所用HTTP方法</td></tr>
+                        <tr><td><kbd>url</kbd></td><td>请求目标的url</td></tr>
+                        <tr><td><kbd>params</kbd></td><td>URL的参数</td></tr>
+                        <tr><td><kbd>headers</kbd></td><td>额外的请求头</td></tr>
+                        <tr><td><kbd>timeout</kbd></td><td>超时时间</td></tr>
+                        <tr><td><kbd>cache</kbd></td><td>GET请求的缓存开关</td></tr>
+                        <tr><td><kbd>transformRequest</kbd></td><td>在与后端交换数据前或交换后，对数据进行处理</td></tr>
+                        <tr><td><kbd>transformResponse</kbd></td><td>在与后端交换数据前或交换后，对数据进行处理</td></tr>
+                    </table>
+                </p>
+                <p><label class="label-info">数据转换：</label>http的get和post方法接受js对象作为data参数，会自动忽略以$开头的属性，转换为json格式</p>
+                <p><label class="label-info">响应处理：</label>请求可能成功或失败，提供两种方法进行回调<code>success和error，参数为data(响应数据),status(响应的HTTP状态),headers(访问HTTP响应头信息的函数),config(请求触发时的配置对象)</code></p>
+            </div>        
+        </div>
+        <div class="panel panel-primary" ng-controller="myCtrl">
+            <div class="panel-heading">promise和$q</div>        
+            <div class="panel-body">
+                <p><label class="label-info">使用背景：</label>在异步调用中，无法链式调用，而是依靠回调。但回调仅在处理一个异步事件时工作的很好，一点需要协调多个异步事件，事情会变得复杂，为了让异步编程更简单，promiseAPI被
+                JS采用，Angular拥有非常轻量化的$q服务。
+                </p>
+                <p><code>$q.defer()</code>deferred延迟对象，反应了未来将完成的任务。其保存了一个promise对象，异步任务的占位符。</p>
+                <p><code>deferred.resolve()</code>履行</p>
+                <p><code>deferred.reject()、$q.reject()</code>拒绝</p>
+                <p><code>deferred.promise.then(success,error)</code>注册回调</p>
+                <p><label class="label-info">异步的链式调用</label>这是promise的强大之处，模拟同步的链式调用，如
+                    <code>
+                        promise.takeOrder('Capricciosa').then(slice).then(pawel.eat,pawel.beHungry);
+                        //抛出的异常会冒泡给第一个捕获块
+                    </code>
+                </p>
+                <p>
+                    <label class="label-info">聚合承诺</label><code>$q.all()</code>
+                    注册多个回调，启动多个异步的承诺，all方法会同时启动多个异步任务，并在所有任务都完成后获得通知，它有效的从多个异步动作聚合承诺，并返回单一的，组合的承诺作为结合点。
+                    <pre>
+    var orderPromise=$q.all(
+        [pizzaPit.takeOrder('Pepperoni'),
+        saladBar.takeOrder('Fresh salad')]);
+    orderPromise.then(pawel.eat);//当上述两个承诺都被resolve后，聚合承诺才会被履行；一个失败则整个承诺会被拒绝。
+                    </pre>
+                    <button class="btn btn-success jfunTooltipCtn jfunTooltipFixed" ng-click="testQ();"
+                     jfun_title="测试1" jfun_content="getCnt1">测试-拒绝</button>
+                    <button class="btn btn-success jfunTooltipCtn jfunTooltipFixed" ng-click="testQAll();"
+                     jfun_title="聚合承诺" jfun_content="getCnt2">测试-聚合</button>
+                </p>
+                <div class="alert alert-warning">{{result}}</div>
+                <p>
+                    <label class="label-info">包装值为承诺</label><code>$q.when()</code>
+                    混用异步动作和同步动作得出的结果，这种情况下将所有结果当做异步来处理更容易。把一个可能是值或者能接着then的promise包装成一个$q promise。这样我们就能处理一个可能是也可能不是promise的对象。
+                    <pre>
+    var orderPromise=$q.all(
+        [pizzaPit.takeOrder('Pepperoni'),
+        $q.when('Fresh salad')]);
+    orderPromise.then(pawel.eat);//当上述两个承诺都被resolve后，聚合承诺才会被履行。
+                    </pre>
+                    <button class="btn btn-success jfunTooltipCtn jfunTooltipFixed" ng-click="testWhen();"
+                     jfun_title="测试1" jfun_content="getCntWhen">测试-When</button>
+                </p>
+                <div class="alert alert-warning">{{result}}</div>
+            </div>        
+                  
+        </div>
+        
+        <div class="panel panel-primary">
+            <div class="panel-heading">promise与$http</div>        
+            <div class="panel-body">
+                <p>
+                    <label class="label-info">$http返回promise对象</label>
+                    $http会返回一个承诺对象，可以注册回调函数。如:
+                    <pre>
+    var orderPromise=$http.get('data.json');
+    orderPromise.then(function(response){
+       $scope.data=response.data;
+    },function(response){
+        throw new Error('something went wrong...');
+    });//
+                    </pre>
+                    response包括data，status，headers，config
+                </p>
+                 <p>
+                    <label class="label-info">success和error</label>这两种额外的便利方法方便注册回调函数。参数为data(响应数据),status(响应的HTTP状态),headers(访问HTTP响应头信息的函数),config(请求触发时的配置对象)
+                 </p>
+            </div>        
+        </div>
+        
+        <div class="panel panel-primary">
+            <div class="panel-heading">RESTful与$resource</div>        
+            <div class="panel-body">
+                <p><label class="label-default">还没用过这东西 以后再加</label>
+                </p>
+            </div>        
+        </div>
+        
+         <div class="panel panel-primary">
+            <div class="panel-heading">$http高级特性</div>        
+            <div class="panel-body">
+                <p><label class="label-success">截取响应</label>$http服务允许我们注册拦截器，它将在每个请求前后执行。
+                </p>
+                <p>
+                    例如，我们要重试失败的请求，可以定义一个拦截器用于检查响应状态码，并在探测到503时重试此请求。
+                    <pre>
+    //模块启动时，配置$httpProvider
+    angular.module('myApp',[]).config(function($httpProvider){
+        <b class="text-primary">$httpProvider.responseInterceptors.push('retryInterceptor');//添加拦截器</b>
+    }).factory('retryInterceptor',function($injector,$q){
+        return function(responsePromise){<b class="text-primary">//responsePromise为响应承诺</b>
+            return responsePromise.then(null,function(errResponse){
+                <b class="text-primary">if(errResponse.status==503){//若返回响应为503</b>
+                    return $injector.get('$http')(errResponse.config);
+                }else{
+                    return <b class="text-primary">$q.reject(errResponse);//将拒绝传播出去</b>
+                }
+            });
+        };
+    });
+                    </pre>
+                 拦截器是一个函数，它接手原始请求的承诺作为参数，并返回另一个将履行成为拦截结果的承诺。本例中检查status以重试。
+                </p>
+            </div>
+          </div>
+          <div class="panel panel-primary">
+             <div class="panel-heading">$http测试</div>        
+             <div class="panel-body">
+                <p><label class="label-success">截取响应</label>$http服务允许我们注册拦截器，它将在每个请求前后执行。
+                </p>
+                <p>
+                    例如，我们要重试失败的请求，可以定义一个拦截器用于检查响应状态码，并在探测到503时重试此请求。
+                    <pre>
+                    </pre>
+                 拦截器是一个函数，它接手原始请求的承诺作为参数，并返回另一个将履行成为拦截结果的承诺。本例中检查status以重试。
+                </p>
+            </div>         
+        </div>
+        <!-- 如果要使用Bootstrap的js插件，必须先调入jQuery -->
+        <script src="../global/js/jquery.js"></script>
+        <script language="javascript" src="../jfunUI/js/jquery.jfun.tooltip.js"></script>
+        <!-- 包括所有bootstrap的js插件或者可以根据需要使用的js插件调用　-->
+        <script src="../global/js/bootstrap.min.js"></script> 
+        <script src="js/angular.js"></script> 
+        <script>
+            angular.module("MyApp",[]).controller("myCtrl",function($scope,$q,$timeout){
+                    //测试1
+                    var suc=function(para){
+                        $scope.result="调用成功"+para;
+                    };
+                    var err=function(para){
+                        $scope.result="调用失败"+para;
+                    };
+                    var reset=function(){
+                         $scope.result="...";
+                    };
+                    $scope.testQ=function(){
+                        reset();
+                       var defer=$q.defer();
+                       defer.promise.then(suc,err);
+                       $timeout(function(){
+                            defer.reject('defer reject')
+                       },1000);
+                    }
+                    $scope.testQAll=function(){
+                        reset();
+                       var defer1=$q.defer();
+                       var defer2=$q.defer();
+                       var promiseAll=$q.all([defer1.promise,defer2.promise]);
+                       promiseAll.then(suc,err);
+                       $timeout(function(){
+                            defer1.resolve('defer1 resolve')
+                       },1000);
+                       $timeout(function(){
+                            defer2.resolve('defer2 resolve')
+                       },3000);
+                    }
+                     $scope.testWhen=function(){
+                       reset();
+                       var defer1=$q.defer();
+                       var promiseAll=$q.all([defer1.promise,$q.when("$q.when")]);
+                       promiseAll.then(suc,err);
+                       $timeout(function(){
+                            defer1.resolve('defer1 resolve')
+                       },1000);
+                    }
+            });
+            
+           function getCnt1(){
+            return '<pre>var defer=$q.defer();<br/>'+
+            'defer.promise.then(suc,err);<br/>'+
+            'defer.reject()</pre>';
+           };
+           function getCnt2(){
+            return ' <pre>var defer1=$q.defer();<br/>'+
+            'var defer2=$q.defer();<br/>'+
+            'var promiseAll=$q.all([defer1.promise,defer2.promise]);<br/>'+
+            'defer1延迟1S后承诺，defer2延迟3S后承诺，3S后调用成功<br/>'+
+            '若defer1和defer2都reject，则1S后调用失败</pre>';
+           };
+           function getCntWhen(){
+            return ' <pre>var defer1=$q.defer();<br/>'+
+            'var promiseAll=$q.all([defer1.promise,$q.when("aaa")]);<br/>'+
+            'defer1延迟1S后承诺，<br/>'+
+            '</pre>';
+           };
+        </script>
+    </body>
+</html>

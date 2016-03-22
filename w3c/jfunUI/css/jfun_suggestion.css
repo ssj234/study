@@ -1,0 +1,49 @@
+/***
+name:jsun_tooltip
+***/
+body{
+	background-color:#EEEFF1;
+}
+#jfun_suggestion_ul
+{
+	display: none;
+	list-style: none;
+	border: 1px solid cyan;
+	box-shadow: 1px 1px 1px 1px cyan;
+	margin: 0;
+	padding: 5px 0 5px 0;
+	background: white;
+	border-radius: 5px;
+	position: fixed;
+}
+#jfun_suggestion_ul>li>a
+{
+	color: black;
+	font-weight: bold;
+	line-height: 30px;
+	font-size: 14px;
+	margin: 0;
+	padding: 0px 5px 0px 5px;
+	cursor: pointer;
+	border-bottom: 1px solid rgb(230, 218, 220);
+	display: block;
+	text-decoration: none;
+}
+/* #jfun_suggestion_ul>li>a::after
+{
+	content: ">";
+	position: absolute;
+	right: 0px;
+	padding-right: 5px;
+	color: cyan;
+} */
+#jfun_suggestion_ul>li>a:hover{
+background-color: #0081c2;
+color: white; 	
+}
+#jfun_suggestion_ul>li>a:focus
+{
+	background-color: #0081c2;
+	color: white; 	
+}
+

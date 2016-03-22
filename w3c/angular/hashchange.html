@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>onhashchange</title>
+	<style type="text/css">
+	.{
+		cursor: pointer;
+	}
+	</style>
+</head>
+<body>
+<a href="#a">aaa</a>
+<a href="#b">bbb</a>
+<a href="#c">ccc</a>
+
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	alert(2222);
+});
+	$(window).on('hashchange', function(){
+		alert(111111);
+	});
+</script>
+</body>
+</html>

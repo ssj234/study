@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>javascript-对象</title>
+<link href="../global/css/common.css" rel="stylesheet"/>
+<link href="../jfunUI/css/jfun_tooltip.css" rel="stylesheet"/>
+<style>
+.origin{
+	width:200px;
+	height:200px;
+	border:1px dashed red;
+	margin:100px;
+}
+.transform{
+	width:198px;
+	height:198px;
+	background:grey;
+	position:absolute;
+	top:21px;
+	left:22px;
+	margin:100px;
+	opacity:0.8;
+}
+.example{
+	position:relative;
+}
+</style>
+</head>
+<body>
+<div class="block">
+	<div class="head">JS对象</div>
+	<ul>
+		<li>new运算符</li>
+		<li>1、rotate(xdeg)	旋转x度，在二维空间内变形。<br/></li>
+	</ul>
+	<div class="example">
+		<div class="origin"></div>
+		<div class="transform" id="rotateDIV"></div>
+		<input type="button" id="rotate" name="rotate" value="rotate" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="旋转45度" jfun_content="$id.css(‘transform’,‘rotate(20deg)’);"/>
+	</div>
+</div>
+
+<script language="javascript" src="../global/js/jquery.js"></script>
+<script language="javascript" src="../jfunUI/js/jquery.jfun.tooltip.js"></script>
+<script>
+/*
+ *1. 实例的__proto__指向的是其原型的prototype
+var Person=function(){};
+
+Person.prototype.getInfo=function(){
+	alert("username:"+this.username);
+};
+
+var person=new Person();
+person.username="zhangsan";
+person.getInfo();
+//判断__proto__是否引用Person.prototype
+if(person.__proto__==Person.prototype)
+{
+	alert("实例的__proto__指向的是其原型的prototype！");
+}
+*/
+function aaa(){}
+var Shape_obj={
+	getArea:function(){
+		return "area:"+this.area;
+	}
+};
+var Retangle_obj={
+		getEdge:function(){
+			return "edge:"+this.edge;
+		}
+	};
+var retangleIns={area:20,edge:4};
+var a1=new aaa();
+//
+if(
+	(Shape_obj.__proto__==Object.prototype)&&
+	(Retangle_obj.__proto__==Object.prototype)&&
+	(retangleIns.__proto__==Object.prototype)
+	)
+{
+	alert("所有无原型的对象都继承于Object.prototype");
+}
+
+alert("原型链接前,retangleIns实例还没有getArea:retangleIns.getArea="+retangleIns.getArea);
+alert("原型链接前,retangleIns实例还没有getEdge方法:retangleIns.getEdge="+retangleIns.getEdge);
+
+//模拟原型链
+Retangle_obj.__proto__=Shape_obj;
+retangleIns.__proto__=Retangle_obj;
+
+alert("原型链接后,retangleIns实例有getArea:retangleIns.getArea="+retangleIns.getArea);
+alert("原型链接后,retangleIns实例有getEdge方法:retangleIns.getEdge="+retangleIns.getEdge);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+</script>
+</body>
+</html>

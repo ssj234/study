@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>ICON font-2</title>
+	<link rel="stylesheet" type="text/css" href="css/basic.css">
+	<link href="../../global/css/common.css" rel="stylesheet"/>
+
+	<style type="text/css">
+	@font-face{
+		font-family: "my-icon";
+		src:url("./moon/fonts/icomoon.eot?5f5zf8");
+		src:url("./moon/fonts/icomoon.eot?#iefix?5f5zf8") format("embedded-opentype"),
+		url("./moon/fonts/icomoon.woff?5f5zf8") format("woff"),
+		url("./moon/fonts/icomoon.ttf?5f5zf8") format("truetype"),
+		url("./moon/fonts/icomoon.svg?5f5zf8#icomoon") format("svg");
+		font-weight: normal;
+		font-style: normal;
+	}
+	s{
+		font-family: my-icon;
+		color: #fff;
+		height: 40px;
+		width: 40px;
+		float: left;
+		font-size: 24px;
+		line-height: 40px;
+		padding-left: 8px;
+		-webkit-font-smoothing: antialiased;
+	 	-moz-osx-font-smoothing: grayscale;
+	}
+	.sprite li{
+		height: 40px;
+		width: 240px;
+		background-color: #b51600;
+		cursor: pointer;
+	}
+	.s-icon{
+		text-decoration:none;
+	}
+	.sprite li a{
+		height: 40px;
+		width: 240px;
+		color: #fff;
+		line-height: 40px;
+	}
+	.sprite li:hover{
+		background-color: #fff;
+	}
+	.sprite li:hover a{
+		color: #b51600;
+	}
+	.icon-a1:after{
+		content: "\e917";
+	}
+	.icon-a2:after{
+		content: "\e918";
+	}
+	.icon-a3:after{
+		content: "\e919";
+	}
+	.icon-a4:after{
+		content: "\e92a";
+	}
+	a:after{
+		content: "after";
+	}
+	a:before{
+		content: "before";
+	}
+	body{
+			margin: 8px;
+		}
+	</style>
+</head>
+<body>
+<div class="block">
+<div class="head">Font-CSS</div>
+<ul>
+		<li>1、首先要有字体图标文件，推荐一个网站icomoon，可以选择图标并下载为字体文件</li>
+		<li>2、字体文件：<br/>
+		eot、svg、ttf、woff<br/></li>
+		<li>3、引入字体：<br/>
+		@font-face{<br/>
+		font-family: "my-icon";<br/>
+		src:url("./moon/fonts/icomoon.eot?5f5zf8");<br/>
+		src:url("./moon/fonts/icomoon.eot<b>?</b>#iefix?5f5zf8") format("embedded-opentype"),<br/>
+		url("./moon/fonts/icomoon.woff?5f5zf8") format("woff"),<br/>
+		url("./moon/fonts/icomoon.ttf?5f5zf8") format("truetype"),<br/>
+		url("./moon/fonts/icomoon.svg?5f5zf8#icomoon") format("svg");<br/>
+		font-weight: normal;<br/>
+		font-style: normal;<br/>
+		}
+		</li>
+		<li>4、CSS中使用<br/>
+		使用:after伪类和context属性设置图标
+		<li>使用字体作为ICON后，可以使用字体相关的CSS对其进行处理,如hover后设置color即可</li>
+	</ul>
+<div class="example">
+ <ul class="sprite">
+ 	<li>
+ 		<s class="s-icon icon-a1"></s>
+ 		<a href="">This is 1</a>
+ 	</li>
+ 	<li>
+ 		<s class="s-icon icon-a2"></s>
+ 		<a href="">This is 1</a>
+ 	</li>
+ 	<li>
+ 		<s class="s-icon icon-a3"></s>
+ 		<a href="">This is 1</a>
+ 	</li>
+ 	<li>
+ 		<s class="s-icon icon-a4"></s>
+ 		<a href="">This is 1</a>
+ 	</li>
+
+ </ul>
+ </div>
+ </div>
+ <script type="text/javascript" src="js/jquery.min.js"></script>
+ <script type="text/javascript">
+ $(".sprite .s-icon").each(function(i) {
+ 	var y=-(i*40);
+ 	$(this).css("background-position-y",y+"px");
+ });
+ $(".sprite li").hover(function(){
+ 	$(this).find(".s-icon").css("color","#b51600");
+ },function(){
+ 	$(this).find(".s-icon").css("color","#fff");
+ });
+ </script>
+</body>
+</html>

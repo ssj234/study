@@ -1,0 +1,162 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>SHADOW</title>
+<link href="../../global/css/common.css" rel="stylesheet"/>
+<link href="../../jfunUI/css/jfun_tooltip.css" rel="stylesheet"/>
+<style>
+	img{
+		border: 5px solid #fff;
+		width: 267px;
+		height: 200px;
+		margin: 0 30px;
+		-webkit-transition:all 0.5s linear 0.1s;
+	}
+	img:hover{
+		border: 5px solid #fff;
+		width: 267px;
+		height: 200px;
+		margin: 0 30px;
+		
+		-webkit-transform:rotate(3deg) scale(1.1,1.1);
+		-webkit-transition:all 0.5s linear 0.1s,all 0.5s linear 0.1s;
+	}
+	.raise{
+		float: left;
+		position:relative;
+		z-index: 1;
+	}
+	.warp{
+		height:500px;
+		margin-top: 50px;
+		position:relative;
+	}
+	.curve
+	{
+		width: 410px;
+		height: 310px;
+		position:relative;
+		z-index: 1;
+		margin: 0 auto;
+	}
+	.effect{
+		width: 400px;
+		height: 300px;
+		background-color: #fff;
+		margin: 30px auto;
+		box-shadow: 0px 0px 10px 0px red,0px 0px 1px 0px red inset;
+		text-align: center;
+		z-index: 1;
+		/*position: relative; if effect have this attr,:after'z-index cannot avalid; */
+	}
+	.effect span{
+		line-height: 300px;
+		font-size: 20px;
+		font-weight: bold;
+	}
+	
+	.effect:after{
+		content: '';
+		background-color: rgba(0,0,0,0.4);
+		box-shadow: 0px 0px 10px 0px #000;
+		z-index: -12;/*z-index need set position=relative/absoulte*/
+		position:absolute;
+		bottom: 8px;
+		top: 8px;
+		left: 10px;
+		right: 10px;
+		border-radius: 30px/5px;
+	}
+	.effect:before{
+		content: '';
+		background-color:rgba(0,0,0,0.4);
+		box-shadow: 0px 0px 10px 0px #000;
+		z-index: -12;/*z-index need set position=relative/absoulte*/
+		position:absolute;
+		bottom: 8px;
+		top: 8px;
+		left: 10px;
+		right: 10px;
+		border-radius: 30px/5px;
+	}
+
+	.raise:before{
+		content: '';
+		background-color:rgba(0,0,0,0.4);
+		box-shadow: 0px 0px 10px 0px #000;
+		z-index: -12;/*z-index need set position=relative/absoulte*/
+		position:absolute;
+		bottom: 6px;
+		top: 5px;
+		left: 35px;
+		right: 35px;
+		border-radius: 30px/5px;
+		-webkit-transform: rotate(2deg);
+		-webkit-font-smoothing: antialiased;
+	}
+	.raise:after{
+		content: '';
+		background-color:rgba(0,0,0,0.4);
+		box-shadow: 0px 0px 10px 0px #000;
+		z-index: -12;/*z-index need set position=relative/absoulte*/
+		position:absolute;
+		bottom: 6px;
+		top: 5px;
+		left: 35px;
+		right: 35px;
+		border-radius: 30px/5px;
+		-webkit-transform: rotate(-2deg);
+		-webkit-font-smoothing: antialiased;
+	}
+</style>
+</head>
+<body>
+
+<div class="block">
+	<div class="head">阴影</div>
+	<ul>
+		<li>1 曲边阴影<br/>
+		其关键在于.effect中添加:before和:after,并进行transform 设置在z轴后端</br>
+		:before/:after并未设置width和height，通过设定top/right/bottom/left四个元素，浏览器计算显示的大小</br>
+		设置z-index时需要设置position为absolute或relative，方能生效</br>
+		<pre>
+			.effect:before{
+				content: '';
+				background-color:rgba(0,0,0,0.4);
+				box-shadow: 0px 0px 10px 0px #000;
+				z-index: -12;/*z-index need set position=relative/absoulte*/
+				position:absolute;
+				bottom: 8px;
+				top: 8px;
+				left: 10px;
+				right: 10px;
+				border-radius: 30px/5px;
+			}
+		</pre></li>
+		<li>2 翘边阴影<br/>
+		其关键在于.effect中添加:before和:after,并进行transform 设置在z轴后端</br>
+		动画结束后若要动画回到起始样式，img和img:hover都需要加-webkit-transition:all 0.5s linear 0.1s;</br></li>
+	</ul>
+	<div class="example" style="position:relative;">
+		<div class="curve">
+			<div class="effect">
+				<span>HELLO SHADOW!</span>
+			</div>
+		</div>
+		<div class="warp">
+			<div class="raise"><img src="images/Lighthouse.jpg"></div>
+			<div class="raise"><img src="images/Penguins.jpg"></div>
+			<div class="raise"><img src="images/Tulips.jpg"></div>
+		</div>
+	</div>
+</div>
+
+<script language="javascript" src="js/jquery.js"></script>
+<script language="javascript" src="../../jfunUI/js/jquery.jfun.tooltip.js"></script>
+<script>
+
+	
+</script>
+</body>
+</html>

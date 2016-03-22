@@ -1,0 +1,45 @@
+/***
+name:jsun_tooltip
+***/
+body{
+	background-color:#EEEFF1;
+}
+.jfun_tab{
+		padding: 0px 20px;
+		background-color: #ffffff;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+	}
+	.jfun_tab ul{
+		padding: 10px 20px 0 20px;
+		border-bottom: 1px solid #e3e6e8;
+		height: 30px;
+	}
+	.jfun_tab ul li{
+		list-style: none;
+		float: left;
+		cursor: pointer;
+		height: 28px;
+		display:inline;
+		padding:0 20px;
+	}
+	.jfun_tab ul li.selected{
+	
+		border-bottom: 2px solid #cc3433;
+	}
+	.jfun_tab ul li:hover{
+	
+		border-bottom: 2px solid #cc3433;
+	}
+	.jfun_tab ul li a{
+		text-decoration: none;
+		font-size: 14px;
+		color: #cc3433;
+		width: 100%;
+		display: block;
+		text-align: center;
+		margin: 0;
+		height:100%;
+	}
+	.jfun_tab div{
+		display: none;
+	}

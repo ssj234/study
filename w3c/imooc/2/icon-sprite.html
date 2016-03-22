@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>CSS Sprite案例演示</title>
+	<link rel="stylesheet" href="css/basic.css">
+	<link rel="stylesheet" href="css/sprite.css">
+	<link href="../../global/css/common.css" rel="stylesheet"/>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/sprite.js"></script>
+	<style type="text/css">
+		body{
+			margin: 8px;
+		}
+	</style>
+</head>
+<body>
+	<div class="block">
+	<div class="head">Sprite</div>
+	<ul>
+		<li>使用background-image和background-position定位</li>
+		<li>1、background-position<br/>
+		对X轴和Y轴进行定位，X>0代表将背景图像向右移动(左方图像)，Y>0代表将背景图像向下移动(上方图像)</li>
+		<li>相反的，如果要定位左边的小图标，X值要增加，定位下方的小图标，Y值要减小<br/></li>
+		<li>下面的例子中，使用img的定位显示图标，hover后设置背景色和图像的position<br/></li>
+	</ul>
+	<div class="example">
+		<ul class="sprite">
+		<li>
+			<s style="background-position: 0 0;" class="s-icon"></s>
+			<a href="">慕课网就是好1</a>
+		</li>
+		<li>
+			<s style="background-position: 0 -40px;" class="s-icon"></s>
+			<a href="">慕课网就是好2</a>
+		</li>
+		<li>
+			<s style="background-position: 0 -80px;" class="s-icon"></s>
+			<a href="">慕课网就是好3</a>
+		</li>
+		<li>
+			<s class="s-icon"></s>
+			<a href="">慕课网就是好4</a>
+		</li>
+		<li>
+			<s class="s-icon"></s>
+			<a href="">慕课网就是好5</a>
+		</li>
+		<li>
+			<s class="s-icon"></s>
+			<a href="">慕课网就是好6</a>
+		</li>
+		<li>
+			<s class="s-icon"></s>
+			<a href="">慕课网就是好7</a>
+		</li>
+		<li>
+			<s class="s-icon"></s>
+			<a href="">慕课网就是好8</a>
+		</li>
+		<li>
+			<s class="s-icon"></s>
+			<a href="">慕课网就是好9</a>
+		</li>
+		<li>
+			<s class="s-icon"></s>
+			<a href="">慕课网就是好10</a>
+		</li>
+		<li>
+			<s class="s-icon"></s>
+			<a href="">慕课网就是好11</a>
+		</li>
+	</ul><img style="position:fixed;top:210px;left:300px;border:1px dashed red" src="images/s-icon.png"></img>
+	</div>
+</div>
+	
+</body>
+</html>

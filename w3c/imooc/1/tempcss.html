@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf8"/>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="css/mycss.css">
+	<style type="text/css">
+	
+	</style>
+</head>
+<body>
+	<div class="navigator">
+		<div class="nav_toolbar">
+			<div class="btn-group">
+	            <button type="button" class="toolItem btn2  dropdown-toggle btn-info" data-toggle="dropdown">
+	              <span class="caret"></span>
+	              <span class="sr-only" >海外网银测试环境地址</span>
+	            </button>
+	            <ul id="serTypeMenu" class="dropdown-menu" role="menu">
+	              <li><a target="_blank" href="list.php"><span class="label label-warning">&nbsp;</span>&nbsp;&nbsp;莫测问题管理统</a></li>
+	              <li><a target="_blank" href="list.php"><span class="label label-info">&nbsp;</span>&nbsp;&nbsp;提交翻译系统</a></li>
+	              <li><a target="_blank" href="list.php"><span class="label label-danger">&nbsp;</span>&nbsp;&nbsp;提交存储过程</a></li>
+	              <li><a target="_blank" href="list.php"><span class="label label-default">&nbsp;</span>&nbsp;&nbsp;标准化系统</a></li>
+	            </ul>
+          	</div>
+          	<div class="btn-group">
+	            <button type="button" class="toolItem btn2   btn-info" data-toggle="dropdown">
+	        	    <span class="sr-only" >取文件</span>
+	            </button>
+          	</div>
+          	<div class="btn-group">
+	            <button type="button" class="toolItem btn2   btn-info" data-toggle="dropdown">
+	        	    <span class="sr-only" >设置</span>
+	            </button>
+          	</div>
+		</div>
+	</div>
+	<div class="content">
+		<div class="body"> 
+			<div class="menu">
+				<div  class="block">
+					<dl>
+						<dt><p>网银</p></dt>
+						<dd>
+							<div class="course_teacher">
+					        	<ul class="menu_list">
+					        		<li>大行区</li>
+					        		<li>亚太区</li>
+					        		<li>欧非区</li>
+					        		<li>美洲区</li>
+					        	</ul>
+					        </div>
+						</dd>
+					</dl>
+					
+					<dl>
+						<dt><p>手机</p></dt>
+						<dd>
+							<div class="course_teacher">
+					        	<ul class="menu_list">
+					        		<li>大行区</li>
+					        		<li>亚太区</li>
+					        		<li>欧非区</li>
+					        		<li>美洲区</li>
+					        	</ul>
+					        </div>
+						</dd>
+					</dl>
+					<dl>
+						<dt><p>其他</p></dt>
+						<dd>
+							<div class="course_teacher">
+					        	<ul class="menu_list">
+					        		<li>国家</li>
+					        		<li>币种</li>
+					        		<li>路径</li>
+					        	</ul>
+					        </div>
+						</dd>
+					</dl>
+					
+				</div>
+			</div>
+			<div class="main">
+				<div id="tabDiv" class="tabDiv">
+					<ul>
+						<li class="selected">1月版</li>
+						<li>2月版3232323232</li>
+						<li>3月版</li>
+						<li>4月版</li>
+					</ul>
+				<div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/bootstrap.js"></script> 
+	<script type="text/javascript">
+		$("#tabDiv").delegate("li","click",function(e){
+			var li=$(e.target);
+			$("#tabDiv li").removeClass("selected");
+			li.addClass("selected");
+		});
+	</script>
+</body>
+</html>

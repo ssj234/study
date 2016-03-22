@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!-- saved from url=(0071)file:///C:/Users/kfzx-shisj/workspace/Study/WebContent/html/circle.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta charset="UTF-8">
+	<title>negative height TEST</title>
+	<style type="text/css" link="../global/css/bootstrap.min.css"></style>
+</head>
+<body>
+
+<div  class="container">
+	<div class="row"><a href="javascript:void(0);">测试1</a></div>
+	<div class="row"><a href="javascript:void(0);">测试2</a></div>
+	<div class="row"><a href="javascript:void(0);">测试3</a></div>
+	<div class="alert alert-info" id="loadRS"></div>
+</div>
+<script type="text/javascript" src="../global/js/jquery.js">
+</script>
+<script>
+$(document).ready(function(){
+    var state={
+        url:null,
+        title:'title',
+        html:''
+    };
+    $("a").eq(0).bind("click",function(){
+        $("#loadRS").load("load.html span",function(data){
+            state.html='data0';
+            history.pushState(state,null,"#0");
+        });
+       
+    });
+    $("a").eq(1).bind("click",function(){
+        $("#loadRS").load("load.html a",function(data){
+            state.html='data1'
+            history.pushState(state,null,"#1");
+        });
+    });
+    $("a").eq(2).bind("click",function(){
+        $("#loadRS").load("load.html div",function(data){
+            state.html='data2'
+            history.pushState(state,null,"#2");
+        });
+    });
+    //事件
+    window.addEventListener("popstate",function(event){
+        if(event&&event.state)
+        {
+             $("#loadRS").html(event.state.html);
+        }
+    });
+});
+
+</script>
+</body></html>

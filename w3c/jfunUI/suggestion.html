@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<link rel="stylesheet" type="text/css" href="css/jfun_suggestion.css">
+	<style>
+	body{
+		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+		font-size: 14px;
+	}
+	</style>
+	<script type="text/javascript">
+	function getAll (key) {
+		var tmp=new Array();
+		for(var i = 0; i <10; i++) {
+			var a=new Object();
+			a.key=key+" ddd"+i;
+			a.value="#";
+			tmp[i]=a;
+		};
+		return tmp;
+	}
+	</script>
+</head>
+<body>
+	<h3>Suggestion</h3>
+	<ul>
+		<li>text输入后进行提示</li>
+		<li>设置一个class，并指定返回的函数</li>
+		<li>该函数返回一个Array</li>
+		<li>根据Array创建div</li>
+	</ul>
+	
+	<input type="text" placeholder="please input" style="width:300px" class="jfun_suggestion" onchange="getAll">
+	<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+	<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+	<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+	<div>dsdsds</div>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.jfun.suggestion.js"></script>
+<script type="text/javascript">
+</script>
+</body>
+</html>
+
+
+
+                            
+                            
+                            
+                            
+                            
+
+                            
+                            
+                          

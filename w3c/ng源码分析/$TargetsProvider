@@ -1,0 +1,211 @@
+//target服务
+function $TargetsProvider() {
+	var targets = {}, //记录viewport当前指定的url，里面是对象{target:,url}
+		transitions = {}, //转场效果
+		trackLine = {
+			count : 0,
+			history : -1,
+			index : 0,
+			tracks : []}, 
+		useLocation = false;
+
+
+	var DEFAULT_TRANSITION = function(oldEl, newEl, remove, back) {
+		if (newEl && newEl.length) {
+			if (oldEl && oldEl.length) {
+				oldEl.css('display', 'none');
+				if (remove)
+					oldEl.remove();
+			}
+			newEl.css('display', '');
+		}
+	};
+	//设置是否使用
+	this.useLocation = function(yes) {
+		useLocation = !!yes;
+	};
+
+	function transition(name, fn) {
+		var old = transitions[name];
+		if (!fn)
+			return old || DEFAULT_TRANSITION;
+		transitions[name] = fn;
+		return old;
+	}
+
+	this.transition = transition;
+
+	//构造函数，返回forward对象
+	Factory.$inject = [ '$window', '$browser', '$log', '$rootScope' ];
+	function Factory(window, $browser, $log, $rootScope) {
+		var viewports = {};
+
+		if (useLocation)
+			$browser.useHistory();
+
+		forward.clearTarget = function(target) {
+			viewports[target] = undefined;
+			targets[target] = undefined;
+		};
+
+		/*
+		 * targets service, could be: 1. page fn(target, pageUrl[, active]) 2.
+		 * viewport fn(target, url[, noHistory])
+		 */
+		 //参数：transView、Welcome/mod.html、
+		function forward(target, urlExp, noHistory, data) {
+			var view;//view是ngViewportController对象
+			//若target为对象或ViewportController
+			if (angular.isObject(target) && target.$trackPage) {// is ViewportController
+				view = target;
+			} else if (angular.isString(target)) {//若target为字符串，从viewports数组获取view
+				//viewports数组值是在$init时加入的
+				view = viewports[target];
+				if (!view)
+					throw minErr('targets')('noviewport',
+							"no viewport found: '{0}'", target);
+			} else {
+				throw minErr('targets')('targetid',
+						"target must be viewportController or its id");
+			}
+			target = view.$id;//ng-viewport元素的id
+			var old = targets[target], url = urlExp;
+			if (!url)//若url为空，返会原来的trace
+				return old;
+
+			if (url.indexOf('#') === 0) {//若url以#开头
+				var page = url.substring(1);//获取url
+				view.$trackPage(page, true);
+				return;
+			}
+
+//			if (old && url === old.url)
+//				return;
+
+			if (noHistory === undefined)
+				noHistory = view.$noHistory;
+
+			var current = {
+				target : target,//id
+				url : url
+			};
+
+			trackLine.count++;
+
+			$log.debug('targets forward to "' + url + '" in "' + target + '" '
+					+ (!noHistory ? '[with track]' : '[without track]'));
+
+			if (!noHistory) {
+				addHistory(current);/
+			}
+
+			toViewport(target, current, null, data);
+		}
+
+		//参数为一个对象，target为id
+		//添加到历史记录
+		function addHistory(current) {
+			if (trackLine.index >= 0
+					&& trackLine.index <= trackLine.tracks.length) {
+				trackLine.tracks.splice(trackLine.index,
+						trackLine.tracks.length - trackLine.index, current);
+			} else {
+				throw minErr('targets')('invalidindex',
+						"invalid history index: '{0}'", trackLine.index);
+			}
+			trackLine.index++;
+			if (useLocation) {
+				var loc = "#/$" + trackLine.index;
+				$browser.History.add({
+					index : trackLine.index
+				}, loc);
+				trackLine.history = window.history.length;
+			}
+		}
+		//转向
+		//参数：viewport的id、对象，
+		function toViewport(target, track, back, data) {
+			targets[target] = track;
+			//调用指定ViewportController
+			viewports[target].$load(track, back, data);
+		}
+
+		function trackHistory(index) {
+			var back = index < trackLine.index;
+			trackLine.index = index;
+			var cur = trackLine.tracks[index - 1];
+			$log.debug('targets track to "' + cur.url + '" in "' + cur.target
+					+ '"');
+			toViewport(cur.target, cur, back);
+		}
+
+		if (useLocation) {
+			$browser.onUrlChange(function(url) {
+				var hash = $browser.hash();
+				if (!hash || hash.indexOf('#/$') !== 0)
+					return;
+				var index = int(hash.substring(3));
+				if (!isNumber(index) || index < 1)
+					throw minErr('targets')('34',
+							"invalid history index: '{0}'", index);
+				if (index > trackLine.tracks.length)
+					return;
+				if (trackLine.index !== index) {
+					trackHistory(index);
+				}
+			});
+		}
+
+		forward.track = function(steps) {
+			var flag = steps.match(/^([\+\-]?)(\d+)$/);
+			if (!flag)
+				return;
+			var n = int(steps);
+			if (flag[1]) {// relative
+				if (trackLine.tracks.length < 2)
+					return;
+				if (n <= -trackLine.index)
+					n = -trackLine.index + 1;
+				if (n > trackLine.tracks.length - trackLine.index)
+					n = trackLine.tracks.length - trackLine.index;
+				if (n === 0)
+					return;
+				if (useLocation) {
+					$browser.History.go(n);
+				} else {
+					trackHistory(trackLine.index + n);
+				}
+			} else {
+				if (n === 0) {
+					// XXX n === 0 is special, it means reset history
+					// history.count prevent reload dead loop
+					if (trackLine.count > 1)
+						return $browser.History.reload(-trackLine.index);
+					return;
+				}
+
+				if (n > trackLine.tracks.length)
+					throw minErr('targets')('35',
+							"history over max index: '{0}'",
+							trackLine.tracks.length);
+
+				if (n === trackLine.index)
+					return;
+				if (useLocation) {
+					$browser.History.go(n - trackLine.index);
+				} else {
+					trackHistory(n);
+				}
+			}
+		};
+		forward.track.info = trackLine;
+		forward.transition = transition;
+
+		forward.$viewports = viewports;
+
+		return forward;
+	}
+
+	// return forward Factory
+	this.$get = Factory;
+}

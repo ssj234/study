@@ -1,0 +1,185 @@
+function $LocationProvider() {
+		var hashPrefix = "",
+			html5Mode = !1;
+
+		//设置或返回hashPrefix
+		this.hashPrefix = function(prefix) {
+			return isDefined(prefix) ? (hashPrefix = prefix, this) : hashPrefix
+		}, 
+		//设置或返回html5Mode
+		this.html5Mode = function(mode) {
+			return isDefined(mode) ? (html5Mode = mode, this) : html5Mode
+		}, 
+
+		this.$get = ["$rootScope", "$browser", "$sniffer", "$rootElement",
+			function($rootScope, $browser, $sniffer, $rootElement) {
+
+				function afterLocationChange(oldUrl) {
+					$rootScope.$broadcast("$locationChangeSuccess", $location.absUrl(), oldUrl)
+				}
+
+				var $location, 
+				LocationMode, 
+				appBase, 
+				baseHref = $browser.baseHref(),//baseHref
+				initialUrl = $browser.url();//url
+				html5Mode 
+					//支持html5，appBase为url的base；支持history，LocationMode为LocationHtml5Url；否则为LocationHashbangInHtml5Url
+					? (appBase = serverBase(initialUrl) + (baseHref || "/"), LocationMode = $sniffer.history ? LocationHtml5Url : LocationHashbangInHtml5Url) 
+					//不支持html5，appBase为url的#之前的字符串，LocationMode为LocationHashbangUrl
+					: (appBase = stripHash(initialUrl), LocationMode = LocationHashbangUrl), 
+
+				$location = new LocationMode(appBase, "#" + hashPrefix), 
+				$location.$$parse($location.$$rewrite(initialUrl)), 
+				$rootElement.on("click", function(event) {
+					if (!event.ctrlKey && !event.metaKey && 2 != event.which) {
+						for (var elm = jqLite(event.target);
+							"a" !== lowercase(elm[0].nodeName);)
+							if (elm[0] === $rootElement[0] || !(elm = elm.parent())[0]) return;
+						var absHref = elm.prop("href"),
+							rewrittenUrl = $location.$$rewrite(absHref);
+						absHref && !elm.attr("target") && rewrittenUrl && !event.isDefaultPrevented() && (event.preventDefault(), rewrittenUrl != $browser.url() && ($location.$$parse(rewrittenUrl), $rootScope.$apply(), window.angular["ff-684208-preventDefault"] = !0))
+					}
+				}), $location.absUrl() != initialUrl && $browser.url($location.absUrl(), !0), $browser.onUrlChange(function(newUrl) {
+					if ($location.absUrl() != newUrl) {
+						if ($rootScope.$broadcast("$locationChangeStart", newUrl, $location.absUrl()).defaultPrevented) return $browser.url($location.absUrl()), void 0;
+						$rootScope.$evalAsync(function() {
+							var oldUrl = $location.absUrl();
+							$location.$$parse(newUrl), afterLocationChange(oldUrl)
+						}), $rootScope.$$phase || $rootScope.$digest()
+					}
+				});
+				var changeCounter = 0;
+				return $rootScope.$watch(function() {
+					var oldUrl = $browser.url(),
+						currentReplace = $location.$$replace;
+					return changeCounter && oldUrl == $location.absUrl() || (changeCounter++, $rootScope.$evalAsync(function() {
+						$rootScope.$broadcast("$locationChangeStart", $location.absUrl(), oldUrl).defaultPrevented ? $location.$$parse(oldUrl) : ($browser.url($location.absUrl(), currentReplace), afterLocationChange(oldUrl))
+					})), $location.$$replace = !1, changeCounter
+				}), $location
+			}
+		]
+	}
+	//返回url的#之前的字符串
+	function stripHash(url) {
+		var index = url.indexOf("#");
+		return -1 == index ? url : url.substr(0, index)
+	}
+	//返回url的baseurl
+	function serverBase(url) {
+		return url.substring(0, url.indexOf("/", url.indexOf("//") + 2))
+	}
+
+	LocationHashbangInHtml5Url.prototype = LocationHashbangUrl.prototype = LocationHtml5Url.prototype = {
+		$$html5: !1,
+		$$replace: !1,
+		absUrl: locationGetter("$$absUrl"),
+
+		url: function(url, replace) {
+			if (isUndefined(url)) return this.$$url;
+			var match = PATH_MATCH.exec(url);
+			match[1] && this.path(decodeURIComponent(match[1])), (match[2] || match[1]) && this.search(match[3] || ""), 
+			this.hash(match[5] || "", replace);
+			return this;
+		},
+
+		protocol: locationGetter("$$protocol"),
+		host: locationGetter("$$host"),
+		port: locationGetter("$$port"),
+		path: locationGetterSetter("$$path", function(path) {
+			return "/" == path.charAt(0) ? path : "/" + path
+		}),
+
+		search: function(search, paramValue) {
+			switch (arguments.length) {
+				case 0:
+					return this.$$search;
+				case 1:
+					if (isString(search)) this.$$search = parseKeyValue(search);
+					else {
+						if (!isObject(search)) throw $locationMinErr("isrcharg", "The first argument of the `$location#search()` call must be a string or an object.");
+						this.$$search = search
+					}
+					break;
+				default:
+					isUndefined(paramValue) || null === paramValue ? delete this.$$search[search] : this.$$search[search] = paramValue
+			}
+			return this.$$compose(), this
+		},
+		hash: locationGetterSetter("$$hash", identity),
+		replace: function() {
+			return this.$$replace = !0, this
+		}
+	};
+
+	//支持html5，支持history
+	function LocationHtml5Url(appBase, basePrefix) {
+		this.$$html5 = !0, basePrefix = basePrefix || "";
+		var appBaseNoFile = stripFile(appBase);
+		parseAbsoluteUrl(appBase, this, appBase), 
+
+		this.$$parse = function(url) {
+			var pathUrl = beginsWith(appBaseNoFile, url);
+			if (!isString(pathUrl)) throw $locationMinErr("ipthprfx", 'Invalid url "{0}", missing path prefix "{1}".', url, appBaseNoFile);
+			parseAppUrl(pathUrl, this, appBase), this.$$path || (this.$$path = "/"), this.$$compose()
+		}, 
+		this.$$compose = function() {
+			var search = toKeyValue(this.$$search),
+				hash = this.$$hash ? "#" + encodeUriSegment(this.$$hash) : "";
+			this.$$url = encodePath(this.$$path) + (search ? "?" + search : "") + hash, this.$$absUrl = appBaseNoFile + this.$$url.substr(1)
+		}, this.$$rewrite = function(url) {
+			var appUrl, prevAppUrl;
+			return (appUrl = beginsWith(appBase, url)) !== undefined ? (prevAppUrl = appUrl, (appUrl = beginsWith(basePrefix, appUrl)) !== undefined ? appBaseNoFile + (beginsWith("/", appUrl) || appUrl) : appBase + prevAppUrl) : (appUrl = beginsWith(appBaseNoFile, url)) !== undefined ? appBaseNoFile + appUrl : appBaseNoFile == url + "/" ? appBaseNoFile : void 0
+		}
+	}
+	//不支持html5
+	function LocationHashbangUrl(appBase, hashPrefix) {
+		var appBaseNoFile = stripFile(appBase);
+		parseAbsoluteUrl(appBase, this, appBase), this.$$parse = function(url) {
+			var withoutBaseUrl = beginsWith(appBase, url) || beginsWith(appBaseNoFile, url),
+				withoutHashUrl = "#" == withoutBaseUrl.charAt(0) ? beginsWith(hashPrefix, withoutBaseUrl) : this.$$html5 ? withoutBaseUrl : "";
+			if (!isString(withoutHashUrl)) throw $locationMinErr("ihshprfx", 'Invalid url "{0}", missing hash prefix "{1}".', url, hashPrefix);
+			parseAppUrl(withoutHashUrl, this, appBase), this.$$compose()
+		}, this.$$compose = function() {
+			var search = toKeyValue(this.$$search),
+				hash = this.$$hash ? "#" + encodeUriSegment(this.$$hash) : "";
+			this.$$url = encodePath(this.$$path) + (search ? "?" + search : "") + hash, this.$$absUrl = appBase + (this.$$url ? hashPrefix + this.$$url : "")
+		}, this.$$rewrite = function(url) {
+			return stripHash(appBase) == stripHash(url) ? url : void 0
+		}
+	}
+	////支持html5，不支持history
+	function LocationHashbangInHtml5Url(appBase, hashPrefix) {
+		this.$$html5 = !0, LocationHashbangUrl.apply(this, arguments);
+		var appBaseNoFile = stripFile(appBase);
+		this.$$rewrite = function(url) {
+			var appUrl;
+			return appBase == stripHash(url) ? url : (appUrl = beginsWith(appBaseNoFile, url)) ? appBase + hashPrefix + appUrl : appBaseNoFile === url + "/" ? appBaseNoFile : void 0
+		}
+	}
+
+	function locationGetter(property) {
+		return function() {
+			return this[property]
+		}
+	}
+
+	function encodePath(path) {
+		for (var segments = path.split("/"), i = segments.length; i--;) segments[i] = encodeUriSegment(segments[i]);
+		return segments.join("/")
+	}
+
+	function parseAbsoluteUrl(absoluteUrl, locationObj, appBase) {
+		var parsedUrl = urlResolve(absoluteUrl, appBase);
+		locationObj.$$protocol = parsedUrl.protocol, locationObj.$$host = parsedUrl.hostname, locationObj.$$port = int(parsedUrl.port) || DEFAULT_PORTS[parsedUrl.protocol] || null
+	}
+
+	function parseAppUrl(relativeUrl, locationObj, appBase) {
+		var prefixed = "/" !== relativeUrl.charAt(0);
+		prefixed && (relativeUrl = "/" + relativeUrl);
+		var match = urlResolve(relativeUrl, appBase);
+		locationObj.$$path = decodeURIComponent(prefixed && "/" === match.pathname.charAt(0) ? match.pathname.substring(1) : match.pathname), 
+		locationObj.$$search = parseKeyValue(match.search), 
+		locationObj.$$hash = decodeURIComponent(match.hash), 
+		locationObj.$$path && "/" != locationObj.$$path.charAt(0) && (locationObj.$$path = "/" + locationObj.$$path)
+	}

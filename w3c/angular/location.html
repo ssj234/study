@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>AngularJS之$location</title>   
+        <!-- Bootstrap -->
+        <link href="../global/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../jfunUI/css/jfun_tooltip.css" rel="stylesheet">        
+        <!-- 以下两个插件用于在IE8以及以下版本浏览器支持HTML5元素和媒体查询，如果不需要用可以移除 -->
+        <!--[if lt IE 9]>
+        <script src="../global/js/html5shiv.js"></script>
+        <script src="../global/js/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body style="margin:5px 10px" ng-app="MyApp" ng-controller="myCtrl"  id="anchor" >
+        
+          <div class="panel panel-primary">
+             <div class="panel-heading">$location<small>---URL抽象层</small></div>        
+             <div class="panel-body">
+                <p>
+                    <kbd>URL-AJAX</kbd>
+                   对于ajaxURL 在html5之前使用hashbang方式，html5支持对history操作，则可以用直观URL
+                   
+                </p>
+                <div class="alert alert-info">
+                   http://myhost.com/myapp/admin/users/list?active=true#bottom
+                </div>
+                <div class="alert alert-info">
+                    http://myhost.com/myapp<kbd>#</kbd>/admin/users/list?active=true#bottom
+                </div>
+                
+                <p>
+                    <kbd>$location.url</kbd>
+                    值为：{{$location.url()}}
+                </p>
+                <p>
+                    <kbd>$location.path</kbd>
+                    值为：{{$location.path()}}
+                </p>
+                <p>
+                    <kbd>$location.search</kbd>
+                    值为：{{$location.search()}}
+                </p>
+                <p>
+                    <kbd>$location.hash</kbd>
+                    值为：{{$location.hash()}}
+                </p>
+                <p>
+                    <kbd>$location.protocol</kbd>
+                    <label class="label label-info">只读</label>值为：{{$location.protocol()}}
+                </p>
+                <p>
+                    <kbd>$location.host</kbd>
+                    <label class="label label-info">只读</label>值为：{{$location.host()}}
+                </p>
+                <p>
+                    <kbd>$location.port</kbd>
+                    <label class="label label-info">只读</label>值为：{{$location.port()}}
+                </p>
+                <p>
+                    <kbd>$location.baseUrl</kbd>
+                    <label class="label label-info">只读</label>值为：{{$location.baseUrl()}}
+                </p>
+                
+                <div class="alert alert-info">
+                   <kbd>$anchorScroll</kbd> 一般情况下,#之后的URL是用来定位的，现在被单页应用用来导航会引起冲突，因此由$anchorScroll来进行页内定位。</br>默认情况，$anchorScroll会
+                   监控URL片段，一旦检测到有需要用于页内定位的哈希，它就会滚动到相应的位置。<a class="jfunTooltipCtn jfunTooltipFixed" jfun_title="代码" jfun_content="getCnt" ng-click="anchor" href="#" >试一试</a>
+                </div>
+            </div>         
+        </div>
+        
+        <div class="panel panel-primary">
+             <div class="panel-heading">$location导航<small>---使用ngInclude和$location</small></div>        
+             <div class="panel-body">
+                <p>
+                    <kbd>URL-AJAX</kbd>
+                   对于ajaxURL 在html5之前使用hashbang方式，html5支持对history操作，则可以用直观URL
+                </p>
+               
+                <div class="alert alert-info">
+                   <a href="#/admin/users/list">[#/admin/users/list]</a>
+                   <a href="#/admin/users/new">[#/admin/users/new]</a>
+                   <pre class="container-fluid" ng-include="selectedRoute.templateUrl">
+                        <!-- goes here -->
+                   </pre>
+                   <pre>
+var routes={//routes对象给出了应用的基础结构，将所有可能的局部模板和URL对应起来，通过此路由定义，可以看出应用由哪些页面组成，每一个路由将使用哪些局部模板
+    '/admin/users/list':{templateUrl:'tpls/users/list.html'},
+    '/admin/users/new':{templateUrl:'tpls/users/new.html'},
+    '/admin/users/edit':{templateUrl:'tpls/users/edit.html'}
+};
+                   </pre>
+                    <pre>
+//通过使用当前URL来同步激活路由
+$scope.$watch(function(){
+    return $location.path();
+},function(newPath){
+    $scope.selectedRoute=routes[newPath]||defaultRoute;
+});
+                    </pre>
+                    <pre>
+//定义路由时，指定控制器，ng-include会创建一个新的scope 需要为每个局部模板定义一个控制器，最直接的方法是在局部模板的根元素上使用ng-controller指令
+//controller的js需要卸载主页面中,卸载子模板中会出错:EditUserCtrl需要写在location.html
+&lt;div ng-controller="<b>EditUserCtrl</b>">
+    &lt;h1>Edit user</h1>
+&lt;/div>
+//缺点在于 不同控制器不能重用相同的局部模板
+                    </pre>
+                </div>
+            </div>         
+        </div>
+        
+        <div class="panel panel-primary">
+             <div class="panel-heading">$route路由<small>---使用$route和$view进行导航</small></div>        
+             <div class="panel-body">
+                <p>
+                    <kbd>基础路由定义</kbd>
+                  使用$routeProvider来定义应用的配置
+                <div class="alert alert-info">
+                   <a href="#/admin/users/listRoute">[#/admin/users/listRoute]</a>
+                   <a href="#/admin/users/newRoute">[#/admin/users/newRoute]</a>
+                   <a href="#/admin/users/1234">[#/admin/users/1234]</a>
+                   <pre class="container-fluid" ng-view>
+                        <!-- goes here -->
+                   </pre>
+                   
+                  <pre>
+app.config(function($routeProvider){
+    $routeProvider
+        <b>.when</b>('/admin/users/newRoute',{templateUrl:'tpls/users/new.html'})
+        <b>.when</b>('/admin/users/listRoute',{templateUrl:'tpls/users/list.html'})
+        <b>.when</b>('/admin/users/editRoute',{templateUrl:'tpls/users/edit.html'})
+        <b>.when('/admin/users/:userid',{templateUrl:'tpls/users/edit.html'})</b>
+        <b>//使用:userid这个路由将匹配任何可以替换:userid通配符的URL</b>
+        <b>//若没有:userid部分或者:userid只有斜杠/ 不会被匹配</b>
+        <b>.otherwise</b>({redirectTo:'/admin/users/listRoute'});
+});
+//ng-view可以通过匹配的路由找到要显示的内容
+&lt;pre class="container-fluid" ng-view>
+&lt;/pre>
+                  </pre>
+                  <pre>
+//路由参数
+app.controller("editCtrl",function($scope,$routeParams){
+    $scope.id=$routeParams.userid;
+});
+//ng-include处理多个UI区域
+  .when('/admin/users/:userid',{templateUrl:'tpls/users/edit.html',menuUrl:'tpls/users/new.html'})
+<div ng-include="$route.current.menuUrl"></div>
+  
+//控制器
+when('/admin/users/editRoute',{templateUrl:'tpls/users/edit.html'，controller:'EditUserCtrl'})
+
+//angularJS默认尽早获取新页面元素,从后端获取数据后,再重新渲染显示UI,如果想要所有后端数据都获取到后再显示新页面元素,使用resolve
+//使用resolve,将路由控制器所有以来的异步数据都罗列出来。确保所有依赖条件都满足后才进行路由
+//resolve函数可以返回js值、对象或promise。若返回promise会等待promise处理完才更新路由
+//resolve支持终止页面跳转，只要resolve中的promise被拒绝reject，angularjs会取消页面跳转
+resolve:{user:function($route,Users){
+    return Users.getById();
+}}
+                  </pre>
+                  </div>
+                </p>
+                <div class="alert alert-info">
+                    <kbd>$route的局限</kbd></br>
+                    <label class="label label-warning">一个路由只对应页面的一个区域</label></br>
+                    <label class="label label-warning">不支持嵌套路由</label>
+                </div>
+             </div>
+        </div>
+        
+        <!-- 如果要使用Bootstrapjs插件，必须先调入jQuery -->
+        <script src="../global/js/jquery.js"></script>
+        <script language="javascript" src="../jfunUI/js/jquery.jfun.tooltip.js"></script>
+        <!-- 包括所有bootstrapjs插件或者可以根据需要使用js插件调用　-->
+        <script src="../global/js/bootstrap.min.js"></script> 
+        <script src="js/angular.js"></script> 
+        
+        <script src="js/route.js"></script> 
+        <script>
+            var app=angular.module("MyApp",['ngRoute']);
+            app.config(function($routeProvider){
+                $routeProvider
+                .when('/admin/users/newRoute',{templateUrl:'tpls/users/new.html'})
+                .when('/admin/users/listRoute',{templateUrl:'tpls/users/list.html'})
+                .when('/admin/users/editRoute',{templateUrl:'tpls/users/edit.html'})
+                .when('/admin/users/:userid',{templateUrl:'tpls/users/edit.html',menuUrl:'tpls/users/new.html'})
+                .otherwise({redirectTo:'/'});
+            });
+            app.controller("myCtrl",function($scope,$q,$location,$anchorScroll){
+               $scope.$location=$location;
+               $location.url("/admin/users/list?active=true#bottom");
+               
+               $scope.anchor=function(anchor){
+                if(!anchor)anchor="anchor";
+                 $location.hash(anchor);
+                 $anchorScroll();
+               };
+               
+               var routes={
+                    '/admin/users/list':{templateUrl:'tpls/users/list.html'},
+                    '/admin/users/new':{templateUrl:'tpls/users/new.html'},
+                    '/admin/users/edit':{templateUrl:'tpls/users/edit.html'}
+               };
+               
+               var defaultRoute=routes['/admin/users/list'];
+               
+               
+               $scope.$watch(function(){
+                    return $location.path();
+               },function(newPath){
+                    $scope.selectedRoute=routes[newPath]||defaultRoute;
+               });
+               //
+               
+            });
+            
+            function getCnt(){
+                return '$location.hash("anchor");</br>$anchorScroll();';
+            }
+            
+            
+        </script>
+        <script>
+            app.controller("newCtrl",function($scope){
+                $scope.name="hello i come from new.html";
+            });
+            app.controller("editCtrl",function($scope,$routeParams){
+                $scope.id=$routeParams.userid;
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,121 @@
+/***
+name:jsun_tooltip
+***/
+body{
+	background-color:#EEEFF1;
+}
+.jfun_gallery{
+	width: 500px;
+	height: 300px;
+	position: relative;
+}
+.jfun_gallery>.main
+{
+	position: relative;
+	width: 500px;
+	height: 300px;
+	overflow: hidden;
+}
+.jfun_gallery>.main>a{
+	z-index: 1;
+}
+.jfun_gallery img{
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0px;
+	left:0px;
+}
+.jfun_gallery>.nav{
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+	height: 30px;
+	width: 100%;
+	background: black;
+	opacity: 0.5;
+}
+.jfun_gallery #jfun_title{
+	line-height: 30px;
+	color: #ffffff;
+	font-size: 14px;
+	font-weight: bold;
+	position: absolute;
+	bottom: 0px;
+	padding-left: 10px;
+}
+.jfun_gallery #jfun_point
+{
+	list-style:none;
+	float: right;
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+	height: 30px;
+	padding: 0;
+	margin: 0;
+}
+.jfun_gallery #jfun_point li
+{
+	float: right;
+	width:16px;
+	color: #ffffff;
+	line-height: 30px;
+	font-size: 16px;
+	cursor: pointer;
+}
+.jfun_gallery #jfun_point li:hover
+{
+	color: rgb(255, 74, 103);
+}
+.jfun_gallery #jfun_point li.select
+{
+	color: red;	
+}
+#jfun_gallery_bar
+{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+.jfun_gallery>.left{
+	width: 30px;
+	height: 25px;
+	1background: cyan;
+	position: absolute;
+	top: 130px;
+	opacity: 0.8;
+	cursor: pointer;
+	color: #ffffff;
+}
+.jfun_gallery>.left::before{
+	content: "<";
+	font-weight: bold;
+	font-size: 40px;
+	vertical-align: center;
+	padding-left: 8px;
+	margin: 0 auto;
+}
+.jfun_gallery>.right{
+	width: 30px;
+	height: 25px;
+	1background: cyan;
+	position: absolute;
+	top: 130px;
+	cursor: pointer;
+	right: 10px;
+	opacity: 0.8;
+	
+}
+.jfun_gallery>.right::before{
+	content: ">";
+	font-weight: bold;
+	font-size: 40px;
+	vertical-align: center;
+	padding: 0px 10px  0 10px;
+	margin: 0 auto;
+	color: #ffffff;
+}
+.jfun_gallery>.right:hover,.jfun_gallery>.left:hover{
+	opacity: 0.8;
+}

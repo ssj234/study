@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+<title>事件流</title>
+<meta charset="utf-8">
+<link href="../../../../global/css/common.css" rel="stylesheet" />
+<link type="text/css" rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="block">
+<div class="head">键盘事件示例</div>
+<ul>
+	<li>点击回车或开始按钮，执行playFun()在title中随即刷新显示奖品</li>
+	<li>再次点击回车或停止按钮，执行stopFun() 停止刷新 显示获得的奖品</li>
+	<li>键盘事件：onkeyup 按键信息在event对象中可获得，event.keyCode==13代表回车按钮</li>
+	<li><a href="js/script.js" target="_blank">JS代码</a></li>
+</ul>
+<div class="example">
+<div id="title" class="title">开始抽奖啦！</div>
+<div class="btns">
+	<span id="play">开 始</span>
+	<span id="stop">停止</span>
+</div>
+</div>
+</div>
+<script src="js/event.js"></script>
+<script src="js/script.js"></script>
+</body>

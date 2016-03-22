@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>CSS3-3D效果</title>
+</head>
+<style type="text/css">
+	#exp{
+		-webkit-perspective:800;
+		-webkit-perspective-origin:50% 50%;
+		-webkit-transform-style:-webkit-preserve-3d;
+	}
+	li.bk{
+		float: left;
+		width: 50px;
+		height: 50px;
+		background-color: red;
+		margin: 50px;
+		font-size: 20px;
+		color: #fff;
+	}
+	ul{
+		list-style: none;
+	}
+	#block1{
+		-webkit-transform:rotateX(45deg);
+		color: #fff;
+		font-size: 20px;
+		padding: 30px;
+		text-align: center;
+	}
+	#block2{
+		width: 50px;
+		height: 50px;
+		background-color: red;
+		//margin: auto;
+		-webkit-transform:rotateY(45deg);
+		padding: 50px;
+		font-size: 50px;
+		padding: 50px;color: #fff;
+		text-align: center;
+	}
+	#block3{
+		width: 50px;
+		height: 50px;
+		background-color: red;
+		//margin: auto;
+		-webkit-transform:rotateZ(45deg);
+		padding: 50px;
+		padding: 30px;
+		text-align: center;
+	}
+	#block4{
+		-webkit-transform:translateX(45px);
+	}
+	#block5{
+		-webkit-transform:translateY(45px);
+	}
+	#block6{
+		-webkit-transform:translateZ(145px);
+	}
+</style>
+<body>
+	<ul>
+				<li>对于一个dom对象，指定3D变换时，需要三个属性	</li>
+				<li>-webkit-perspective:800;定义3D元素距视图的距离</li>
+				<li>-webkit-perspective-origin:50% 50%;定义3D元素所基于的X轴和Y轴</li>
+				<li>-webkit-transform-style:-webkit-preserve-3d 保留3D位置；flat=子元素不保留3D位置； </li></ul>
+	<ul id="exp">
+		<li  class="bk" id="block1">rotateX</li>
+		<li  class="bk" id="block2">rotateY</li>
+		<li  class="bk" id="block3">rotateZ</li>
+		<li  class="bk" tip="translateX" id="block4">translateX</li>
+		<li  class="bk" id="block5">translateY</li>
+		<li class="bk"  id="block6">translateZ</li>
+	</ul>
+</body>
+</html>

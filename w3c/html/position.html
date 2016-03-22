@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>POSITION TEST</title>
+</head>
+<body >
+<div id="div1" style="position:fixed;top:100px;left:100px;width:300px;height:300px;border:2px solid red;z-index:1">
+	<div id="div2" style="position:static;width:200px;height:200px;border:2px solid red;margin:20px;z-index:1">
+		<div id="div3" style="position:absolute;top:0px;left:20px;width:50px;height:50px;border:2px solid red;z-index:1">
+			<div id="div4" style="position:relative;top:10px;left:10px;width:20px;height:20px;border:2px solid red;z-index:1">
+			</div>
+		</div>
+	</div>
+</div>
+<div>
+	<div onmouseover="over(1)"  onmouseout="out(1)">div1为fixed top:100px;left:100px;fixed相对于浏览器窗口进行定位<br/></div>
+	<div onmouseover="over(2)"  onmouseout="out(2)">div2为static，但margin为20<br/></div>
+	<div onmouseover="over(3)"  onmouseout="out(3)">div3为absolute,top:0px;left:20px;absolute相对于第一个非static父元素进行定位<br/></div>
+	<div onmouseover="over(4)"  onmouseout="out(4)">div4为relative,top:0px;left:20px;absolute相对于其正常位置进行定位<br/></div>
+</div>
+<script type="text/javascript">
+	function over(type)
+	{
+		var t=document.getElementById("div"+type);
+		t.style.borderColor="blue";
+	}
+	function out(type)
+	{
+		var t=document.getElementById("div"+type);
+		t.style.borderColor="red";
+	}
+</script>
+</body>
+</html>

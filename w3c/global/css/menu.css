@@ -1,0 +1,46 @@
+ul{
+			margin:0;
+			padding:0;
+		}
+		li{
+			list-style:none;
+			padding-left: 1em;
+		}
+		body{
+			  font-family: "Microsoft Yahei UI","Microsoft YaHei",Helvetica,Arial,sans-serif;
+			  background:white;
+		}
+		.menu_head{
+			line-height: 60px;
+			color: #4e4d4a;
+			font-size:1.4em;
+			border-bottom:1px solid #E8C9C9;
+			margin-bottom: 1em;
+		}
+		ul a{
+			font-size: 14px;
+			text-decoration:none;
+			color: #77746E;
+			line-height:35px;
+			display: block;
+			white-space:nowrap;
+			font-weight:bold;
+		}
+		ul{
+			
+		}
+		ul li:hover{
+		  background-color: #f0f0f0;
+		}
+		.blank{
+			height: 1px;
+  			border-top: 1px dashed #E8C9C9;
+		}
+		.title{
+			font-size:15px;
+			color:red;
+  			border-left: 2px solid red;
+		}
+		.selected{
+			 background-color: #f0f0f0;
+		}

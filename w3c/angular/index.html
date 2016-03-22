@@ -1,0 +1,37 @@
+<html>
+<head>
+	<title>angular</title>
+	<meta charset=utf-8>
+	<link href="../global/css/common.css" rel="stylesheet"/>
+	<link href="../jfunUI/css/jfun_tooltip.css" rel="stylesheet"/>
+	<script language="javascript" src="js/jquery.js"></script>
+	<script language="javascript" src="js/angular.min.js"></script>
+</head>
+<body>
+<div class="block" v-app="myApp">
+	<div class="head">Injector</div>
+	<ul>
+		<li>injector的使用<br/>
+		1.annotate()方法,传入一个方法，解析出一个入参的数组</br>
+		2.get()方法返回一个服务的实例，可以接受一个参数：要获取的实例的名称</br>
+		3.has()方法返回一个布尔值，在$injector能够从自己的注册列表中找到对应的服务时返回true，否则返回false。</br>
+		3.instantiate()方法可以创建某个JavaScript类型的实例。</br>
+		3.invoke()方法会调用方法并从$injector中添加方法参数。</br>
+		<pre>
+			
+		</pre></li>
+	</ul>
+	
+</div>
+<script>
+    var app=angular.module("myApp",[]);
+    app.factory("serv",[function(){
+    	return {};
+    }]);
+	var injector = angular.injector(['myApp']);
+	console.log(injector);
+	var scope = injector.get('$rootScope').$new();
+	console.log(scope);
+</script>
+</body>
+</html>

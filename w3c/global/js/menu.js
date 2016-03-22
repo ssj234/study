@@ -1,0 +1,12 @@
+(
+function(){
+	$("li").click(function(){
+		if($(this).hasClass("title")||$(this).hasClass("blank"))
+			{
+			return;
+			}
+		$("li").removeClass("selected");
+		$(this).addClass("selected");
+	});
+}	
+)();

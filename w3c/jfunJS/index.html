@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>jfun plugin TEST</title>
+<link href="../global/css/common.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="block">
+	<div class="head"><b>JFUN plugin</b></div>
+	<ul>
+		<li>这是一些自己常用的方法，进行了封装</li>
+		<li>1.setLocValue/getLocValue 设置本地存储，IE使用COOKIE Chrome使用localStorage。
+			setLocValue(key,value)/getLocValue(key)</li>
+		<li>2.getLocScript从本地加载js文件<br/>
+			getLocScript(src,succ,err)succ为成功时的回调 err为失败回调 参数为e</li>
+		<li class="code">
+		$.getLocScript("js/test22.js",function(){
+			alert(data.name);
+		},function(){
+			alert("error");
+		});
+	</li>
+	</ul>
+	<div class="example">
+	<input type="button" id="success" name="success" value="success"/>
+	<input type="button" id="error" name="error" value="error"/>
+	<div id="loadRS" class="result">
+	</div></div>
+</div>
+
+<script language="javascript" src="js/jquery.js"></script>
+<script language="javascript" src="js/jquery.jfun.js"></script>
+<script>
+	$(document).ready(function(){
+		$("#success").click(function(){
+			$.getLocScript("js/test.js",function(){
+				alert(data.name);
+			},function(){
+				alert("error");
+			});
+		});
+		$("#error").click(function(){
+			$.getLocScript("js/test2.js",function(){
+				alert(data.name);
+			},function(){
+				alert("sorry load error");
+			});
+		});
+	});
+</script>
+</body>
+</html>

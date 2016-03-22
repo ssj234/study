@@ -1,0 +1,43 @@
+/***
+name:jsun_tooltip
+***/
+body{
+	background-color:#EEEFF1;
+}
+#jfun_tooltip{
+	padding: 0;
+	margin: 0;
+	height: 0px;
+	position: absolute;
+	top:20px;
+	left:20px;
+	display: none;
+}
+#jfun_tooltip>dl{
+		padding: 0px 20px;
+		background-color: #ffffff;
+		box-shadow: 0 4px 4px rgba(0,0,0,0.1);
+		margin: 0px;
+}
+	#jfun_tooltip_dt{
+		font-size: 14px;
+		line-height: 40px;
+		color: #333;
+  		border-bottom: 1px solid #e3e6e8;
+  		background:url(../images/learnicon.png) no-repeat 0px 8px scroll;
+	}
+	#jfun_tooltip_dt>p{
+		padding-left: 25px;
+		margin: 0px;
+	}
+	#jfun_tooltip dl dd{
+		padding: 20px 0px ;
+		margin: 0px;
+		font-size: 14px;
+		color: #000000;
+		padding: 0;
+	}
+
+	#jfun_tooltip_div{
+		padding: 10px 10px;
+	}

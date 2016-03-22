@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>SHADOW</title>
+<link href="../../global/css/common.css" rel="stylesheet"/>
+<link href="../../jfunUI/css/jfun_tooltip.css" rel="stylesheet"/>
+<style>
+	.waller{
+		width:300px;
+		height:300px;
+		position: relative;
+		z-index: 1;
+		margin: 0 auto;
+	}
+	.wall
+	{
+		width:300px;
+		height:300px;
+		border:1px dashed red;
+		margin:auto;
+		background-image: url(./images/change.png);
+		z-index: 1;
+		border:10px solid yellow;
+	}
+	.wall:before
+	{
+		content: '';
+		background-image: url(./images/change.png);
+		
+		position:absolute;
+		top:0px;
+		right:0px;
+		left: 0px;
+		bottom: 0px;
+		transform-origin:50% 100%;
+		z-index: -1;
+		border: 1px dashed red;
+		transition:all  0.8s linear;
+		opacity: 0.2;
+		border:10px solid yellow;
+	}	
+	.wall:after
+	{
+		content: '';
+		width:300px;
+		height:300px;
+		background-image: url(./images/change.png);
+		position:absolute;
+		top:0px;
+		right:0px;
+		left: 0px;
+		bottom: 0px;
+		transition:all  0.8s linear;
+		transform-origin:50% 100%;
+		z-index: -1;
+		border: 1px dashed grey;
+		opacity: 0.2;
+		border:10px solid yellow;
+	}
+	.wall:hover:after
+	{
+		transform:rotate(30deg);
+		opacity: 0.8;
+	}
+	.wall:hover:before
+	{
+		transform:rotate(-30deg);
+		opacity: 0.8;
+	}
+</style>
+</head>
+<body>
+
+<div class="block">
+	<div class="head">图片墙</div>
+	<ul>
+		<li>z-index与position一起用的时候就没有作用了，why....<br/>
+		思路：.wall设置一下before和after，在.wall的后面-z-index为-1；.wall为z-index为1</br>
+		但是不行啊，因为我设置了.wall的position</br>
+		解决：我在.wall外层新加了一个.waller，帮助wall定位</br>
+		<pre>
+			&lt;div class="waller"&gt;
+				&lt;div class="wall"&gt;&lt;/div&gt;
+			&lt;/div&gt;
+		</pre></li>
+	</ul>
+	<div class="example" style="position:relative;">
+		<div class="waller">
+			<div class="wall"></div>
+		</div>
+	</div>
+</div>
+
+<script language="javascript" src="js/jquery.js"></script>
+<script language="javascript" src="../../jfunUI/js/jquery.jfun.tooltip.js"></script>
+<script>
+
+	
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<!-- saved from url=(0071)file:///C:/Users/kfzx-shisj/workspace/Study/WebContent/html/circle.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta charset="UTF-8">
+	<title>negative height TEST</title>
+	<style type="text/css">
+		
+.circle{
+			width: 100px;
+			height: 100px;
+			border-radius: 50%;
+			background: blue;
+			margin:200px auto;
+			-webkit-transform:rotate(0deg);
+			position: relative;
+			z-index: -10;
+			-webkit-transform: translateZ(0);
+			box-shadow: 0px 0px 10px 0px #fff;
+			border: 5px solid blue;
+		}
+		#circle{
+			width: 100px;
+			height: 100px;
+			border-radius: 50%;
+			background: blue;
+			margin:200px auto;
+			-webkit-transform:rotate(0deg);
+			position: relative;
+			z-index: -10;
+			-webkit-transform: translateZ(0);
+			box-shadow: 0px 0px 10px 0px #fff;
+			border: 5px solid blue;
+		}
+		#text{
+			position: absolute;
+			z-index: 1;
+			background: cyan;
+			top: 5px;
+			bottom: 5px;
+			left: 5px;
+			right: 5px;
+			border-radius: 50%;
+			-webkit-transform: translateZ(0);
+			border: 3px solid blue;
+		}
+		
+		#run
+		{
+			position: absolute;
+			z-index: -3;
+			background: yellow;
+			top: 0px;
+			bottom: 0px;
+			left: 0px;
+			right: 0px;
+			border-radius: 50%;
+			clip: rect(0px 50px 100px 0px);
+			-webkit-transform:rotate(0deg);
+			1-webkit-animation: rotatefrm 2s  linear  ;
+		}
+		#cover{
+			position: absolute;
+			z-index: 1;
+			background: transparent;
+			top: 0px;
+			bottom: 0px;
+			left: 0px;
+			right: 0px;
+			border-radius: 50%;
+			clip: rect(0px 50px 100px 0px);
+			border: 5px solid blue;
+
+		}
+
+		span{
+			margin: 0 auto;
+			line-height: 90px;
+			color: rgb(20, 20, 15);
+			font-size: 1.5em;
+			text-align: center;
+			display: block;
+			font-weight: bold;
+		}
+		
+		@-webkit-keyframes  rotatefrm{
+				0%{
+					-webkit-transform:rotate(0deg) translateZ(0);
+				
+				}
+				
+				100%{
+					-webkit-transform:rotate(180deg) translateZ(0);
+					
+				}
+			}
+			
+	</style>
+</head>
+<body>
+
+<div  id="circle">
+	<div id="text">
+		<span>0%</span>
+	</div>
+	<div id="run"></div>
+	<div id="cover"></div>
+</div>
+
+<div  class="circle"></div>
+<a href="javascript:setProcess(90);">click</a>
+<script type="text/javascript" src="../jQuery/js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.jfun.procircle.js"></script>
+<script type="text/javascript">
+// proc from 0 to 100
+//
+function setProcess(proc)
+{
+	
+	if (proc<0||proc>100) return;
+	var deg=3.6*proc;
+
+	$("#run").animate({textIndent:deg},
+		{
+			step:function(now,fx){
+				var flag=true;
+				if(flag&&now>=180)
+				{
+					$("#cover").css("clip","rect(0px 100px 100px 50px)")
+								.css("border-color","yellow");
+					flag=false;
+				}
+
+				$(this).css('-webkit-transform',"rotate("+now+"deg)");
+				$("#text span").text(parseInt(now/3.6,10)+"%");
+
+			},
+			duration:'3000'
+		},'linear','3000'
+	);
+	
+
+}
+setProcess(1);
+
+</script>
+
+
+</body></html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>等高DIV TEST</title>
+	<style type="text/css">
+		.main{
+			width: 50%;
+			background: cyan;
+			min-height: 200px;
+			box-shadow: 0px 0px 10px 0px #ddd;
+			margin: 0 auto;
+			height: 100%;
+			position:relative;
+		}
+
+		.left{
+			width: 20%;
+			background: red;
+			min-height: 150px;
+			margin: 10px 10px;
+			box-shadow: 0px 0px 10px 0px #000;
+			
+		}
+		.right{
+			width:50%;
+			background: #ddd;
+			min-height: 150px;
+			margin: 10px;
+			box-shadow: 0px 0px 10px 0px #000;
+			
+
+		}
+		.line{
+			background: #ddd;
+			margin:5px;
+			padding: 5px;
+			color:#000;
+			font-size: 10px;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body >
+<div>
+	<div class="line" onclick="over(0,this)"  >子容器扩大，父容器如何也扩大？<br/></div>
+	<div class="line" onclick="over(1,this)" >1.若未设置float,则父div可根据子的高度自适应<br/></div>
+	<div class="line" onclick="over(2,this)" >2.若left和right设置为float,且未设置清除浮动，则父div不能根据子的高度自适应<br/></div>
+	<div class="line" onclick="over(3,this)" >3.若left和right设置为float,且未设置清除浮动，<b>可以在父容器增加一个清除浮动的div，让父容器知道高度即可</b></div>
+	<div class="line" onclick="over(4,this)" >4.若left和right设置为float,在<b>&lt;br style="clear:both"/&gt;</b></div>
+	<div class="line" onclick="over(5,this)" >5.设置DIV等高,<b>left和right设置paddingBottom:2000px;marginBottom:-2000px</b></div>
+	<div class="line" onclick="over(6,this)" >6.设置DIV等高,<b>将left设置为absolute,不设置高度，通过top/bottom设置高度；right依然为float，并添加clear:both的新div告诉父div高度</b></div>
+</div>
+<div id="div" class="main">
+	<div id="div1" class="left">
+		left
+	</div>
+	<div id="div2" class="right">
+		right
+	</div>
+	
+</div>
+<script type="text/javascript">
+
+	if (!document.getElementsByClassName) {
+		document.getElementsByClassName=function(name){
+			var tmp=document.getElementsByTagName("*");
+			var rs=new Array();
+			for (var i = tmp.length - 1; i >= 0; i--) {
+				if(tmp[i].className==name)
+				{
+					rs.push(tmp[i]);
+				}
+			};
+			return rs;
+		}
+	}
+	function over(type,e)
+	{
+		out();
+		e.style.background="green";
+		var t=document.getElementById("div");
+		var t1=document.getElementById("div1");
+		var t2=document.getElementById("div2");
+		if(type==1)
+		{
+			var rs="";
+			for (var i =20; i >= 0; i--) {
+				rs+="right</br>";
+			}
+			t2.innerHTML=rs;
+		}
+		if(type==2)
+		{
+			t1.style.float="left";
+			t2.style.float="right";
+			var rs="";
+			for (var i =20; i >= 0; i--) {
+				rs+="right</br>";
+			}
+			t2.innerHTML=rs;
+		}
+		if(type==3||type==5)
+		{
+			var rs="";
+			for (var i =20; i >= 0; i--) {
+				rs+="right</br>";
+			}
+			t2.innerHTML=rs;
+
+			t1.style.float="left";
+			t2.style.float="right";
+
+			var son=document.createElement("div");
+			son.style.clear="both";
+			son.className="div_add";
+			t.appendChild(son);
+		}
+		if(type==4)
+		{
+			var rs="";
+			for (var i =20; i >= 0; i--) {
+				rs+="right</br>";
+			}
+			t2.innerHTML=rs;
+
+			t1.style.float="left";
+			t2.style.float="right";
+
+			var son=document.createElement("br");
+			son.style.clear="both";
+			son.className="div_add";
+			t.appendChild(son);
+		}
+
+		if(type==5)
+		{
+			t1.style.paddingBottom="2000px";
+			t2.style.paddingBottom="2000px";
+
+			t1.style.marginBottom="-2000px";
+			t2.style.marginBottom="-2000px";
+
+			t.style.overflow="hidden";
+		}
+		if(type==6)
+		{
+			var rs="";
+			for (var i =20; i >= 0; i--) {
+				rs+="right</br>";
+			}
+			t2.innerHTML=rs;
+
+
+			t1.style.position="absolute";
+			t1.style.top="0px";
+			t1.style.bottom="0px";
+
+			t2.style.float="right";
+
+			var son=document.createElement("div");
+			son.style.clear="both";
+			son.className="div_add";
+			t.appendChild(son);
+		}
+	}
+
+	//<br style="clear:both"/>
+	function out(type)
+	{
+		var t=document.getElementById("div");
+		var t1=document.getElementById("div1");
+		var t2=document.getElementById("div2");
+		t1.style.float="";
+		t2.style.float="";
+		t2.innerHTML="right";
+
+		var line=document.getElementsByClassName("line");
+		for(var i=0;i<line.length;i++)
+		{
+			line[i].style.background="#ddd";
+		}
+
+		var div_adds=document.getElementsByClassName("div_add");
+		for(i=0;i<div_adds.length;i++)
+		{
+			t.removeChild(div_adds[i]);
+		}
+
+			t1.style.paddingBottom="";
+			t2.style.paddingBottom="";
+
+			t1.style.marginBottom="";
+			t2.style.marginBottom="";
+
+			t.style.overflow="";
+
+			t1.style.position="";
+			t1.style.top="";
+			t1.style.bottom="";
+
+	}
+</script>
+</body>
+</html>

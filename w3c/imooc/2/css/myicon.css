@@ -1,0 +1,27 @@
+.sprite li{
+	width:340px;
+	height:40px;
+	background:#b51600;
+	cursor: pointer;
+	border-bottom-color: #b51600;
+	border-bottom: 2px;
+}
+.sprite li:hover{
+	background:#fff;
+	color:#b51600;
+}
+.sprite li:hover a{
+	color:#b51600;
+}
+.sprite li a{
+	font-size:19px;
+	color:#fff;
+	line-height: 40px;
+}
+.sprite li s{
+	width: 20px;
+	height:40px;
+	background-image: url(../images/s-icon.png);
+	float: left;
+	
+}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>CSS3动画-transition</title>
+<link href="../global/css/common.css" rel="stylesheet"/>
+<link href="../jfunUI/css/jfun_tooltip.css" rel="stylesheet"/>
+<style>
+#transition{
+	
+	-webkit-transition:all 0.5s linear 0.1s;
+	-moz-transition:all 0.5s linear 0.1s;
+	-ms-transition:all 0.5s linear 0.1s;
+	transition:all 0.5s linear 0.1s;
+	-os-transition:all 0.5s linear 0.1s;
+}
+#transition:hover{
+	font-size:20px;
+	color:red;
+	background:#ffffff;
+	-webkit-transition:all 0.5s linear 0.1s;
+	-moz-transition:all 0.5s linear 0.1s;
+	-ms-transition:all 0.5s linear 0.1s;
+	transition:all 0.5s linear 0.1s;
+	-os-transition:all 0.5s linear 0.1s;
+}
+img{
+	-webkit-transition:all 0.5s linear 0.1s;
+}
+img:hover{
+	-webkit-transform:scale(1.5,1.5);
+	-webkit-transition:all 0.5s linear 0.1s;
+}
+</style>
+</head>
+<body>
+<div class="block">
+	<div class="head">动画-transition</div>
+	<ul>
+		<li>transition用于DOM元素在多个CSS直接的过渡，如通过鼠标的单击、获得焦点、被点击等触发时，以平滑的动画效果改变CSS属性。</li>
+		<li>使用transition分为三步：<br/>
+			1.默认样式中声明元素的初始状态样式<br/>
+			2.声明过渡元素最终状态的样式<br/>
+			3.添加过渡函数，增加不同样式</li>
+		<li>transition是一个复合属性，有如下子属性<br/>
+			transition-property:指定过渡CSS属性，过渡属性必须具有中点值才可以，如color、wdith等。<b>all</b>代表所有属性。<br/>
+			transition-duration:完成动画所需时间，如0.5s。<br/>
+			transition-timing-function:过渡函数，<br/>
+			<pre>
+				ease
+				linear
+				ease-in
+				ease-out
+				ease-in-out
+			</pre>
+			transition-delay:开始出现的延迟时间。<br/></li>
+			<li>合并transition<br/>
+			a{transition：background 0.8s linear 0.3,color 0.6s ease-out 0.3}<br/>
+			</li>
+	</ul>
+	<div class="example">
+		<input type="button" id="transition" name="transition" value="transition" class="jfunTooltipCtn jfunTooltipFixed" jfun_title="过渡" jfun_content="getCSS"/>
+		<div style="overflow:hidden"><img src="images/bg_logo.png" class="jfunTooltipCtn " jfun_title="过渡" jfun_content="hover时设置了transform:scale(1.5,1.5);"></img></div>
+	</div>
+
+</div>
+
+<script language="javascript" src="../global/js/jquery.js"></script>
+<script language="javascript" src="../jfunUI/js/jquery.jfun.tooltip.js"></script>
+<script>
+function getCSS()
+{
+	return "#transition:hover{font-size:20px;"+"<br/>"+
+	 		"	color:red;"+"<br/>"+
+	 		"	background:#ffffff;"+"<br/>"+
+			"	transition:all 0.5s linear 0.1s;"+"<br/>"+
+			"}";
+}
+</script>
+</body>
+</html>

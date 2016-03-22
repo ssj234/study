@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>ICON test</title>
+	<link rel="stylesheet" type="text/css" href="css/basic.css">
+	<link rel="stylesheet" type="text/css" href="css/app.css">
+	<link href="../../global/css/common.css" rel="stylesheet"/>
+	<style>
+	body{
+			margin: 8px;
+		}
+	</style>
+</head>
+<body>
+<div class="block">
+<div class="head">ICON应用</div>
+<div style="padding-left:20px;">
+		<li>1、旋转使用CSS3的动画animation:spinner 2s infinite linear;<br/></li>
+		<pre>@-webkit-keyframes spinner{
+		0%{
+			-webkit-transform:rotate(0deg);
+			transform: rotate(0deg);
+		}
+		100%{
+			-webkit-transform:rotate(359deg);
+			transform: rotate(359deg);
+		}
+		}</pre></pre><br/>
+		500ms后 移除该class即可</li>
+		<li>2、点击Speaker后为icon-4添加使用scale类，该类含有CSS3的动画animation:scaleFade 0.5s forwards;<br/></li>
+		<pre>@-webkit-keyframes scaleFade{
+		50%{
+			opacity: 1;
+			-webkit-transform:scale(1);
+		}
+		100%{
+			opacity: 0;
+			-webkit-transform:scale(2);
+		}
+		}</pre></pre><br/>
+		500ms后 移除该class即可</li>
+	</div>
+	
+ <ul class="sprite">
+ 	<li>
+ 		<s class="s-icon icon-1">&#xe917;</s>
+ 	</li>
+ 	<li>
+ 		<s class="s-icon icon-2 spinner">&#xe91d;</s> 		
+ 	</li>
+ 	<li>
+ 		<s class="s-icon icon-3">&#xe919;</s>
+ 		
+ 	</li>
+ 	<li>
+ 		<s class="s-icon icon-4 ">&#xe91a;</s>
+ 	</li>
+ </ul>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+ </div>
+
+ <script type="text/javascript" src="js/jquery.min.js"></script>
+ <script type="text/javascript">
+ 
+ $(".icon-4").click(function(){
+ 	$(this).addClass("scale");
+ 	setTimeout(function(){
+ 		$(".icon-4").removeClass("scale");
+ 	},500);
+ });
+ </script>
+</body>
+</html>
