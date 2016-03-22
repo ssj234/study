@@ -9,5 +9,5 @@ function add (teacherName,students) {
 		student.add(item);
 	})
 }
-
+//其他模块引用后返回的是exports对象，因此会有add方法
 exports.add=add
