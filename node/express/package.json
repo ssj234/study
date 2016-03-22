@@ -1,0 +1,13 @@
+{
+  "name": "ssj234",
+  "file": "ssj234",
+  "version": "0.1.0",
+  "description": "ssj234 is my name",
+  "license": "MIT",
+  "devDependencies": {
+    
+  },
+  "dependencies": {
+    "express": "3.x"
+  }
+}
