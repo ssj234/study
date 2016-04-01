@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Promise test</title>
+	<script type="text/javascript" src="angular.js"></script>
+</head>
+<body ng-app="main">
+<DIV ng-controller="list">
+	{{name}}
+	<DIV ng-controller="detail">
+		{{name}}
+	</DIV>
+</DIV>
+<script type="text/javascript">
+	angular.module("main",[]);
+	
+	// (function(window){
+	// 	function list($scope){
+	// 		$scope.name=123;
+	// 	}
+	// 	window.list=list;
+	// })(window);
+
+	// function list($scope){
+	// 	$scope.name='heheda';
+	// 	function detail($scope){
+	// 		$scope.name='youhou';
+	// 	}
+	// 	$scope.detail=detail;
+	// }
+	/*****
+	angular.module("main").run(function($q) {
+
+		function hehe(){
+			var defer=$q.defer('_hehe');
+			// setTimeout(function(){
+				defer.resolve('hehe');
+			// },1000);
+			
+			return defer.promise;
+		}
+		function imok(name){
+			alert(name+' imok');
+		}
+		function imfail(name){
+			alert(name+' imfail');
+		}
+
+		// var promise=hehe();
+		// promise.then(imok,imfail);
+		
+		function task1(){
+			var defer=$q.defer();
+			setTimeout(function(){
+				//defer.resolve('task1 completed!');
+				defer.reject('task1 have some error!');
+			},1000)
+			return defer.promise;
+		}
+		function task2(){
+			var defer=$q.defer();
+			setTimeout(function(){
+				defer.resolve('task2 completed!');
+			},2000)
+			return defer.promise;
+		}
+
+		$q.reject(task1()).then(function(reason){
+			console.log('task completed! reson: '+reason);
+		},function(reason){
+			console.log('task occured error! reson:'+reason);
+		});
+
+	});
+
+	// function nextTick(fn){
+	// 	setTimeout(fn,0);
+	// }
+	*************************/
+
+	function defaultCB(val){
+		return val;
+	}
+	function isFunction(obj){
+		return typeof obj==="function";
+	}
+	function defer(){
+		var pedding=[],value;
+		this.resolve=function(val){
+			var callback=pedding;
+			pedding=undefined;
+			if(val&&isFunction(val.then)){//若是一个promise
+				value=val;
+			}else{
+				value={
+					then:function(cb){
+						setTimeout(function(){
+							cb(val);
+						},0);
+					}
+				}
+			}
+			if(callback.length>0){
+				for(var i=0,len=callback.length;i<len;i++)
+					var cb=callback[i];
+					value.then(cb[0], cb[1], cb[2]);
+			}
+		}
+
+		this.reject=function(val){
+
+		}
+
+		this.notify=function(val){
+
+		}
+
+		this.promise={
+
+			then:function(cb,err,progress){
+				var then_defer=new defer();
+				cb=cb||defaultCB;
+				err=err||defaultCB;
+				progress=progress||defaultCB;
+
+				var cb_a=function(val){
+					then_defer.resolve(cb(val));
+				}
+				var cb_b=function(val){
+					then_defer.reject(err(val));
+				}
+				var cb_c=function(val){
+					then_defer.notify(progress(val));
+				}
+
+				if(pedding){
+					pedding.push([cb_a,cb_b,cb_c]);
+				}else{
+					value.then(cb_a,cb_b,cb_c);
+				}
+				return then_defer.promise;
+			}
+		}
+		
+		return this;
+	}
+
+	function hehe(){
+		var _defer=new defer('_hehe');
+		setTimeout(function(){
+			_defer.resolve('hehe');
+		},1000)
+		return _defer.promise;
+	}
+	var pms=hehe();
+	pms.then(function(){
+		alert('success');
+	},function(){
+		alert('error');
+	}).then(function(){
+		alert('success2');
+	});
+	/**/
+</script>
+</body>
+</html>
