@@ -1,0 +1,53 @@
+<table class="table table-hover" id="banTable">
+</table>
+<div data-role="content" id="l-map" style="height:300px;">
+
+		</div>
+	
+<script>
+	var net;
+	$.getJSON("js/xu.json",function(data){
+		//alert(data.length);
+		net=data;
+		data[10]={placeName:""};
+		data[11]={placeName:""};
+		for(var t=0;t<data.length;t+=4){
+			//console.log(data[t]);
+			$("#banTable").append("<tr><td><a href=\"javascript:go("+t+")\">"+data[t].placeName+"</a></td><td>"+
+					"<a href=\"javascript:go("+(t+1)+")\">"+
+					data[t+1].placeName+"</a></td><td>"+"<a href=\"javascript:go("+(t+2)+")\">"+
+					data[t+2].placeName+"</a></td><td>"+"<a href=\"javascript:go("+(t+3)+")\">"+
+					data[t+3].placeName+"</a></td></tr>");
+		}
+		pointX=data[0].placeX;
+		pointY=data[0].placeY;
+		pointTitle==data[0].placeDetail;
+		
+		
+	});
+	function go(index){
+		window.location.hash="ST";
+		
+		var allOverlay = map.getOverlays();
+        for (var i = 0; i < allOverlay.length; i++){
+        	map.removeOverlay(allOverlay[i]);
+        }
+        
+		var x=net[index].placeX;
+		var y=net[index].placeY;
+		var pointTitle=net[index].placeDetail;
+		
+		 var point = new BMap.Point(x,y);
+		var marker = new BMap.Marker(point);  // 创建标注
+	     map.addOverlay(marker);               // 将标注添加到地图中
+	     marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+		    
+		 map.panTo(new BMap.Point(x,y));
+	}
+	
+	var script = document.createElement("script");
+	script.type = "text/javascript";
+	script.src = "http://api.map.baidu.com/api?v=2.0&ak=tSfs3WxKw7udLb6Z4HNeuG2u&callback=initMap";
+	document.body.appendChild(script);
+	
+</script>

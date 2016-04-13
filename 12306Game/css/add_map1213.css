@@ -1,0 +1,132 @@
+#l-map {
+	width: 95%;
+	height: 95%;
+	overflow: hidden; hidden;
+	margin: 0;
+}
+#add_div {
+	display: block;
+	background-color: #FFF;
+	background-size: 20px 20px;
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 32px;
+	height: 32px;
+	cursor: pointer;
+}
+
+#add_div_left {
+	display: block;
+	background-color: #754BCA;
+	background-size: 20px 20px;
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 0px;
+	height: 12px;
+	float: left;
+	cursor: pointer;
+	font-size: 12px;
+	text-align: center;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	color:rgb(22, 247, 247);
+	text-shadow:0 0px 0 #f3f3f3;
+}
+
+#add_div_right {
+	display: block;
+	background-color: cyan;
+	background-size: 20px 20px;
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-image: url('../images/add_24.png');
+	width: 32px;
+	height: 32px;
+	float: right;
+	cursor: pointer;
+}
+
+#tooltip_div {
+	display: block;
+	background-color: #FFF;
+	background-size: 20px 20px;
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 160px;
+	height: 32px;
+	cursor: pointer;
+}
+
+#tooltip_div_1 {
+	display: block;
+	background-color: cyan;
+	background-size: 20px 20px;
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-image: url('../images/reset_24.png');
+	width: 32px;
+	height: 32px;
+	float: left;
+	cursor: pointer;
+	font-size: 12px;
+	text-align: center;
+}
+
+#tooltip_div_2 {
+	display: block;
+	background-color: #CCFFFF;
+	background-size: 20px 20px;
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 96px;
+	height: 12px;
+	float: left;
+	cursor: pointer;
+	font-size: 12px;
+	text-align: center;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+#tooltip_div_3 {
+	display: block;
+	background-color: cyan;
+	background-size: 20px 20px;
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-image: url('../images/go_24.png');
+	width: 32px;
+	height: 32px;
+	float: right;
+	cursor: pointer;
+}
+.btnn{
+width: 64px;
+height: 28px;
+line-height: 28px;
+text-align: center;
+background: #754BCA;
+color: #fff;
+margin-top: -4px;
+font-size: 12px;
+_position: relative;
+float: left;
+display: inline;
+text-decoration: none;
+
+}
+.sep{
+width: 1px;
+height: 28px;
+line-height: 28px;
+text-align: center;
+background: #754BCA;
+color: #fff;
+margin-top: -4px;
+font-size: 12px;
+_position: relative;
+float: left;
+display: inline;
+text-decoration: none;
+opacity: 0.5;	
+}
