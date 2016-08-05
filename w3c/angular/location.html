@@ -183,7 +183,7 @@ resolve:{user:function($route,Users){
             var app=angular.module("MyApp",['ngRoute']);
             app.config(function($routeProvider){
                 $routeProvider
-                .when('/admin/users/newRoute',{templateUrl:'tpls/users/new.html'})
+                .when('/admin/users/newRoute',{templateUrl:'tpls/users/new.html',controller:"newCtrl"})
                 .when('/admin/users/listRoute',{templateUrl:'tpls/users/list.html'})
                 .when('/admin/users/editRoute',{templateUrl:'tpls/users/edit.html'})
                 .when('/admin/users/:userid',{templateUrl:'tpls/users/edit.html',menuUrl:'tpls/users/new.html'})
