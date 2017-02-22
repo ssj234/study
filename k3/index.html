@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html ng-app="build">
+  <head>
+    <base>
+    
+    <title>东方时尚科目三考试-灯光模拟训练</title>
+    <meta charset="utf-8">
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+<!--	<meta http-equiv="expires" content="0">    -->
+	<meta http-equiv="keywords" content="12306,买票，回家">
+	<meta http-equiv="description" content="This is my page">
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<link rel="stylesheet" type="text/css" href="res/bootstrap.min.css">
+<!--	<link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">-->
+<style type="text/css">
+#exp{
+		-webkit-perspective:800;
+		-webkit-perspective-origin:50% 50%;
+		-webkit-transform-style:-webkit-preserve-3d;
+	}
+#block6{
+		-webkit-animation: rotatefrm 4s  linear infinite alternate;
+	-moz-animation: rotatefrm 4s  linear infinite alternate;
+	-ms-animation: rotatefrm 4s  linear infinite alternate;
+	animation: rotatefrm 4s  linear infinite alternate;
+	}
+@-webkit-keyframes  rotatefrm{
+				0%{
+					-webkit-transform:rotateX(0deg);
+					-ms-transform:rotateX(0deg);
+					-moz-transform:rotateX(0deg);
+<!--					transform:rotateX(0deg);-->
+				}
+				
+				100%{
+					-webkit-transform:rotateX(359deg);
+					-ms-transform:rotateX(359deg);
+					-moz-transform:rotateX(359deg);
+					transform:rotateX(359deg);
+				}
+			}
+</style>
+  </head>
+<div id='wx_pic' style='margin:0 auto;display:none;'>
+<img src='res/k3.jpg' />
+</div>
+  
+  <body ng-controller="myCtrl" style="background: rgb(255, 118, 118);">
+  	<nav class="navbar navbar-default">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#">东方时尚-灯光模拟考试</a>
+          </div>
+          
+        </div>
+      </nav>
+   <div style="text-align:center;">
+   	<h5 style="color:yellow">请您正确使用灯光，从容通过科目三考试!!!</h5>
+   	<a id="begin" class="btn  btn-primary">开始考试</a>
+   	<label>
+      <input id="circle"  type="checkbox">auto
+    </label>
+   	<audio id="player" src="res/0.mp3" style="display:none">
+		Your browser does not support the audio element.
+	</audio>
+   </div>
+   </br>
+   <!-- 广告位 -->
+   <div class="container">
+   		<div class="row">
+   			
+   			<div id="imgArea" class="col-xs-12 col-md-12">
+   				<a href="#" class="thumbnail">
+   					<img id="canvas" alt="loading..." src="res/k3.jpg">
+   				</a>
+   			</div>
+   			
+   		</div>
+   </div>
+   <div class="container">
+   	<div class="row">
+
+   			<div class="col-xs-3 col-md-3">
+   				<a id="show" onclick="answer(0)" class="btn  btn-warning" >近光灯</a>
+   			</div>
+   			<div class="col-xs-3 col-md-3" style="text-align: center;">
+   				<a id="show" onclick="answer(1)" class="btn  btn-warning" >远光灯</a>
+   			</div>
+   			<div class="col-xs-3 col-md-3" style="text-align: center;">
+   				<a id="show" onclick="answer(2)" class="btn  btn-warning" >交替提醒</a>
+   			</div>
+   	</div>
+   	</br>
+   	<div class="row">
+   			<div class="col-xs-6 col-md-6">
+   				<a id="next" onclick="answer(3)" class="btn  btn-warning" >示宽灯</a>
+   			</div>
+   			<div class="col-xs-6 col-md-6">
+   				<a id="next" onclick="answer(4)" class="btn  btn-warning" >关闭灯光</a>
+   			</div>
+   	</div>
+   </div>
+
+
+  </br></br></br>
+  
+   
+    <script src="res/jquery.min.js"></script>
+    <script src="res/bootstrap.min.js"></script>
+    <script>
+// 下面开始模拟夜间灯光考试，请开启灯光！
+// 现在进入无照明道路行驶
+// 现在进入照明不良道路行驶
+// 前方近距离跟车
+// 前方道路恢复照明
+// 前方车辆会车
+// 前方通过路口
+// 通过急转弯
+// 通过坡道
+// 通过拱桥
+// 通过人行横道
+// 通过没有交通信号灯的路口
+// 前方超车
+// 路边临时停车
+// 考试结束，请关闭灯光
+// 前方通过照明不良的路口
+// 前方通过无照明路口
+		var btns=["近光灯","远光灯","交替提醒","示宽灯","关闭灯光"];
+    	var answers=[0,1,1,0,0,0,0,2,2,2,2,2,2,3,4,2,2];
+    	var count=16;
+    	var player=document.getElementById('player');
+    	var $player=$(player);
+    	var seg=8000;
+    	var playing=0;
+		function begin() {
+			player.pause();
+			play(0);
+		}
+
+		function play(index){
+			var flag=player.canPlayType("audio/mp3");
+			if(!flag){
+				alert("对不起，您的浏览器不支持播放语音！");
+			}
+			player.load();
+			$player.attr("src","res/"+index+".mp3");
+			player.play();
+			playing=index;
+			if($("#circle")[0].checked){
+				circle();
+			}
+		}
+		function next(){
+		
+			var rand=Math.round(Math.random()*count);
+			rand=rand%count;
+			play(rand);
+			if($("#circle")[0].checked){
+				circle();
+			}
+		}
+		$("#begin").click(function(){
+			begin();
+		});
+
+		function answer(index){
+			if($("#circle")[0].checked){
+				return;
+			}
+			var a=answers[playing];
+			if(a!=index){
+				alert("错误,应该为"+btns[a]);
+			}
+			next();
+		}
+		function circle(){
+			if($("#circle")[0].checked){
+				setTimeout(next,seg);
+			}
+		}
+    </script>
+  </body>
+</html>
