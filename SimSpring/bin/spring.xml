@@ -1,0 +1,6 @@
+<beans>
+	<bean id="helloBaby" class="com.shisj.spring.test.HelloBaby">
+		<param name="age">20</param>
+		<param name="name">Kitty</param>
+	</bean>
+</beans>
