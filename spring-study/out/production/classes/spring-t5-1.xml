@@ -1,0 +1,15 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context = "http://www.springframework.org/schema/context"
+       xmlns:p = "http://www.springframework.org/schema/p"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="
+                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-2.5.xsd
+       					   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+    <context:component-scan base-package="com.shisj.study.spring" resource-pattern="five/*.class">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Repository" />
+    </context:component-scan>
+
+</beans>
