@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="vue.js"></script>
+</head>
+<body>
+	<!-- outer  innertemplate  objecttemplate -->
+	<div id="root">msg is: {{ msg }}</div>
+	<h1>Outer in h1</h1>
+	<script type="text/javascript">
+		new Vue({
+			el:"#root",
+			data: {
+				msg:"Hello World!"
+			},
+			template: '<h2>template msg : {{msg}}</h2>'
+		})
+	</script>
+</body>
+</html>

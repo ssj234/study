@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="vue.js"></script>
+</head>
+<body>
+	<div id="root">
+		<div v-if="show"> hello world</div>
+		<div v-show="show"> hello world</div>
+		<button @click="toggle">toggle</button>
+		<ul>
+			<li v-for="(people,index) in peoples" :key="people" :id="'name'+index">
+				[{{index}}] name:{{people.name}},age:{{people.age}}
+			</li>
+		</ul>
+	</div>
+	
+	<script type="text/javascript">
+		new Vue({
+			el:"#root",
+			data:{
+				show: true,
+				peoples:[
+					{name:"shi",age:34},
+					{name:"xi",age:60}
+				]
+			},
+			methods:{
+				toggle:function(argument) {
+					this.show = !this.show
+				}
+			}
+		})
+	</script>
+</body>
+</html>

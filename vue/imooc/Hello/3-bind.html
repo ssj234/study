@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="vue.js"></script>
+	<style type="text/css">
+		div{
+			height: 50px;
+		}
+	</style>
+</head>
+<body>
+	<div id="root">
+		<div title="this is a hello world">hello world</div>
+		<div v-bind:title="'test:'+ title">hello world bind</div>
+		<div :title="'test2:'+ title">hello world bind 2</div>
+		<input type="text" name="" v-model="content">
+		<p>{{content}}</p>
+	</div>
+	
+	<script type="text/javascript">
+		new Vue({
+			el:"#root",
+			data:{
+				title: "this is a hello world from title",
+				content: "this is content"
+			}
+		})
+	</script>
+</body>
+</html>

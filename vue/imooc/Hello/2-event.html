@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="vue.js"></script>
+</head>
+<body>
+	<!-- outer  innertemplate  objecttemplate -->
+	<div id="root">
+		<h1>hello {{msg}}</h1>
+		<h2 v-text="number"></h2>
+		<h3 v-html="html"></h3>
+		<h4 v-on:click="handleClick">[v-on:click] click-me:{{msg}}</h4>
+		<h5 @click="handleClick">[v-on:click] click-me:{{msg}}</h5>
+	</div>
+	
+	<script type="text/javascript">
+		new Vue({
+			el:"#root",
+			data: {
+				msg:"Hello World!",
+				number: 123,
+				html:"<i>html</i>"
+			},
+			methods:{
+				handleClick: function(data){
+					this.msg = "changed" + new Date().getTime();
+				}
+			}
+		})
+	</script>
+</body>
+</html>
