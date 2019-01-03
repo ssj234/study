@@ -13,8 +13,8 @@ export default new Router({
       name: 'Main',
       component: Main,
       children: [
-      	{name: 'HelloWorld', path: '/hello', component:HelloWorld},
-      	{name: 'Book', path: '/book/:id', component:Book},
+      	{name: 'HelloWorld', path: '', component: HelloWorld},
+      	{name: 'Book', path: '/book/:id', component: Book},
       ]
     }
   ]
