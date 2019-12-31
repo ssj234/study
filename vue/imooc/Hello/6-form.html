@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="vue.js"></script>
+</head>
+<body>
+	<div id="root">
+		<ul class="li">
+			<li>
+				<input type="text" v-model="text"><br/>
+				<p>text val is : {{text}}</p>
+			</li>
+			<li>
+				<textarea v-model="textarea" rows="3" cols="20"></textarea><br/>
+				<p>textarea val is : {{textarea}}</p>
+			</li>
+			<li>
+				<input type="checkbox" v-model="checkbox" id="singleCbox" value="box"> singleCbox<br/>
+				<p>checkbox val is : {{checkbox}}</p>
+			</li>
+			<li>
+				<input type="checkbox" v-model='multiCbox' value='football'> 足球
+				<input type="checkbox" v-model='multiCbox' value='baskball'> 篮球
+				<input type="checkbox" v-model='multiCbox' value='pingpang'> 乒乓球
+				<br/>
+				<p>multiCbox: {{multiCbox}}</p>
+			</li>
+			<li>
+				<input type="radio" value="male" v-model="sex">男
+				<input type="radio" value="female" v-model="sex">女
+				<br/>
+				<p>sex:{{sex}}</p>
+			</li>
+			<li>
+				<select v-model="stype">
+					<option v-for="item in opts" :value="item.val">{{item.name}}</option>
+				</select>
+				<p>selected: {{stype}}</p>
+			</li>
+		</ul>
+	</div>
+	
+	<script type="text/javascript">
+		new Vue({
+			el:"#root",
+			data:{
+				text: 'v-model with text',
+				textarea: 'v-model with textarea',
+				checkbox: false,
+				multiCbox: ['football'],
+				sex: 'female',
+				stype: 'type1',
+				opts: [{name: 'all',val: 'all'},{name: '类型1',val: 'type0'},{name: '类型2',val: 'type1'}]
+			},
+			methods:{
+				
+			}
+		})
+	</script>
+</body>
+</html>

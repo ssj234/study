@@ -18,7 +18,7 @@
 				this.bookID = to.params.id
 			}
 		}
-	}
+	}   	
 </script>
 <style scoped>
 </style>

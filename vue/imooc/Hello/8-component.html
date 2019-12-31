@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="vue.js"></script>
+</head>
+<body>
+	<h1>Dynamic component</h1>
+	<div id="root">
+		<button @click="change">one</button>
+		<button @click="change">two</button>
+		<button @click="change">three</button>
+		<component :is="componentId"></component>
+		<my-button v-bind:title.sync="title"></my-button>
+		<p>title is {{title}}</p>
+	</div>
+	
+	<script type="text/javascript">
+
+		Vue.component('button-one',{
+			template: '<div>button-one</div>',
+		})
+		Vue.component('button-two',{
+			template: '<div>button-two</div>',
+		})
+		Vue.component('button-three',{
+			template: '<div>button-three</div>',
+		})
+
+		Vue.component('my-button',{
+			props: ['title'],
+			template: '<button @click="click">sec:{{title}}</button>',
+			methods: {
+				click: function() {
+					this.title = new Date().getSeconds();
+					this.$emit('update:title', this.title)
+				}
+			}
+		})
+
+		new Vue({
+			el:"#root",
+			data:{
+				componentId: 'button-one',
+				title: 'sec'
+			},
+			methods:{
+				change: function(event) {
+					this.componentId = 'button-' + event.target.innerText;
+				}
+			}
+		})
+	</script>
+</body>
+</html>

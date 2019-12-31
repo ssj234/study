@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="vue.js"></script>
+</head>
+<body>
+	<h1>slot</h1>
+	<div id="root">
+		
+		<h2>基础slot</h2>
+		<my-button v-bind:title.sync="title">
+			<i>hello,{{title}}</i>
+		</my-button>
+		<p>title is {{title}}</p>
+		
+		<hr/>
+		<h2>具名slot</h2>
+		<div>
+			<my-button2 v-bind:title.sync="title2">
+				<template slot="header">header</template>
+				<main>hello,{{title}}</main>
+				<footer>footer</footer>
+			</my-button2>
+			<p>title is {{title2}}</p>
+		</div>
+	</div>
+	
+	<script type="text/javascript">
+
+		Vue.component('my-button',{
+			props: ['title'],
+			template: '<div><button @click="click">sec:{{title}}</button><slot></slot></div>',
+			methods: {
+				click: function() {
+					this.title = new Date().getSeconds();
+					this.$emit('update:title', this.title)
+				}
+			}
+		})
+
+		Vue.component('my-button2',{
+			props: ['title'],
+			template: '<div><button @click="click">sec:{{title}}</button><header><slot name="header"></slot></header></div>',
+			methods: {
+				click: function() {
+					this.title = new Date().getSeconds();
+					this.$emit('update:title', this.title)
+				}
+			}
+		})
+
+		new Vue({
+			el:"#root",
+			data:{
+				componentId: 'button-one',
+				title: 'sec',
+				title2: 'sec'
+			},
+			methods:{
+				change: function(event) {
+					this.componentId = 'button-' + event.target.innerText;
+				}
+			}
+		})
+	</script>
+</body>
+</html>

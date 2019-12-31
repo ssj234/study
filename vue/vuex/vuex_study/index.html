@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>vuex_study</title>
+  </head>
+  <body>
+      <pre>
+        >>> 将状态从根组件“注入”到每一个子组件中
+        >>> mapState辅助函数帮助我们生成computed
+        >>> getters 抽取了根据store中state的相关方法，在子组件中可以使用
+        在main.js中，调用了App组件，
+                        App组件调用了HelloWorld组件
+        在main.js中，使用了vuex，并创建了store，传入了主组件中
+        HelloWorld组件使用mapstate引用了count，computed: mapState(['count'])
+        在App组件中，设置了方法会修改store的count值
+      </pre>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="vue.js"></script>
+</head>
+<body>
+	<div id="root">
+		<span>hello size is {{size}}</span>
+		<button-center show="c1" size="12" @font="font"></button-center>
+		<button-center show="c2" size="14" @font="font"></button-center>
+		<button-center show="c3" size="16" @font="font"></button-center>
+	</div>
+	
+	<script type="text/javascript">
+		Vue.component('button-center',{
+			props: ['show','size'], 
+			data: function() {
+				return {
+					count: 0,
+					size: 18
+				}
+			},
+			template: '<div><button @click="count++">add-{{show}}</button><span>{{count}} times</span><a href="#" @click="font()">font</a></div>',
+			methods: {
+				font: function() {
+					this.$emit('font',this.size)
+				}
+			}
+
+		})
+		new Vue({
+			el:"#root",
+			data:{
+				size: 0 
+			},
+			methods:{
+				font: function(size) {
+					this.size = size
+				}
+			}
+		})
+	</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+	<script src="../vue.js"></script>
+    <script src="vuex.js"></script>
+</head>
+<body>
+    <div id="app">
+        <button @click="increment">+</button>
+        <button @click="decrement">-</button>
+        <counter></counter>
+    </div>
+    <script>
+        const store = new Vuex.Store({
+            state: {
+                count: 0
+            },
+            mutations: {
+                increment: state => state.count++,
+                decrement: state => state.count--
+            }
+        });
+        
+        Vue.use(Vuex);
+        var counter = Vue.component("counter",{
+            template: '<div>{{count}}</div>',
+            computed: {
+                count () {
+                    return this.$store.state.count
+                }
+            },
+        });
+        // store 会传递给子组件，子组件中通过this.$store获取注入的store
+        new Vue({
+            el: '#app',
+            store,
+            methods: {
+                increment () {
+                    store.commit('increment')
+                },
+                decrement () {
+                    store.commit('decrement')
+                }
+            }
+        });
+    </script>
+</body>
+</html>

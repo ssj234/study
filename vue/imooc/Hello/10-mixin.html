@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="vue.js"></script>
+</head>
+<body>
+	<h1>minin</h1>
+	<div id="root">
+		{{message}}
+		<hr/>
+	</div>
+	
+	<script type="text/javascript">
+
+		Vue.mixin({
+			data : function() {
+				return {
+					message: 'gmessage',
+					global: 'global'
+				}
+			},
+			created() {
+				console.log('created..... 0');
+			},
+		});
+		var mixin = {
+			data : function() {
+				return {
+					message: 'mininmsg',
+					bar: 'bar'
+				}
+			},
+			created() {
+				console.log('created..... 1');
+			},
+		}
+		
+
+		new Vue({
+			el:"#root",
+			mixins : [mixin],
+			data:{
+				message: 'innermsg',
+				foo: 'foo',
+			},
+			created() {
+				console.log('created..... 2');
+				console.log(this.$data);		
+			}
+		})
+	</script>
+</body>
+</html>
